@@ -1,3 +1,3 @@
-# Quasar App
+# Reporting Weekly 
 
-> WIP
+> The week tasking system is based on quasar framework

@@ -44,6 +44,8 @@ module.exports = function (ctx) {
     // framework: 'all' --- includes everything; for dev only!
     framework: {
       components: [
+        'QSpinner',
+        'QSpinnerHourglass',
         'QLayout',
         'QLayoutHeader',
         'QLayoutDrawer',
@@ -57,7 +59,9 @@ module.exports = function (ctx) {
         'QListHeader',
         'QItem',
         'QItemMain',
-        'QItemSide'
+        'QItemSide',
+        'QField',
+        'QInput'
       ],
       directives: [
         'Ripple'
