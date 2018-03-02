@@ -1,7 +1,9 @@
 <template>
     <div class="login">
         WEEKLY REPORT
-        <q-input v-model="loginParams.username" float-label="username" />
+        <q-input v-model="loginParams.username"
+                 @blur="$v.loginParams.username.$touch"
+                 float-label="username" :error="$v.loginParams.username.$error" />
         <q-input v-model="loginParams.password" type="password" float-label="password" />
 
         <q-btn
@@ -17,7 +19,7 @@
 </template>
 
 <script>
-
+    import {required, minLength} from 'vuelidate/lib/validators';
     export default {
         name: 'Login',
         data () {
@@ -27,6 +29,12 @@
                     password: ''
                 },
                 loading: false
+            }
+        },
+        validations: {
+            loginParams: {
+                username: {required, minLength: minLength(3)},
+                password: {required, minLength: minLength(3)}
             }
         },
         created () {
@@ -39,7 +47,18 @@
         methods: {
             login () {
                 const _this = this;
+                _this.$v.loginParams.$touch();
+
+                if (_this.$v.loginParams.$error) {
+                    _this.$q.dialog({
+                        title: 'Error',
+                        message: 'Please review fields again.'
+                    });
+                    return;
+                }
+
                 _this.loading = true;
+
                 _this.$axios.post('/api/login', _this.loginParams).then((res) => {
                     console.log('post res: => ', res.data);
                     if (res.data.code === 0) {
