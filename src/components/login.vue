@@ -1,10 +1,28 @@
 <template>
     <div class="login">
         WEEKLY REPORT
-        <q-input v-model="loginParams.username"
-                 @blur="$v.loginParams.username.$touch"
-                 float-label="username" :error="$v.loginParams.username.$error" />
-        <q-input v-model="loginParams.password" type="password" float-label="password" />
+        <q-field
+                :error="$v.loginParams.username.$error"
+                error-label="Required">
+            <q-input float-label="username"
+                     @input="$v.loginParams.username.$touch"
+                     v-model="loginParams.username" />
+        </q-field>
+
+        <q-field
+                :error="$v.loginParams.password.$error"
+                error-label="Required">
+            <q-input float-label="password"
+                     type="password"
+                     @input="$v.loginParams.password.$touch"
+                     v-model="loginParams.password" />
+        </q-field>
+
+        <!--<q-input v-model="loginParams.password"-->
+                 <!--@input="$v.loginParams.password.$touch"-->
+                 <!--:error="$v.loginParams.password.$error"-->
+                 <!--type="password" float-label="password"/>-->
+        <!--<span class="form-group__message" v-if="!$v.loginParams.username.required">Field is required</span>-->
 
         <q-btn
                 :loading="loading"
@@ -33,8 +51,8 @@
         },
         validations: {
             loginParams: {
-                username: {required, minLength: minLength(3)},
-                password: {required, minLength: minLength(3)}
+                username: {required},
+                password: {required}
             }
         },
         created () {
@@ -50,17 +68,16 @@
                 _this.$v.loginParams.$touch();
 
                 if (_this.$v.loginParams.$error) {
-                    _this.$q.dialog({
-                        title: 'Error',
-                        message: 'Please review fields again.'
-                    });
+//                    _this.$q.dialog({
+//                        title: 'Error',
+//                        message: 'Please review fields again.'
+//                    });
                     return;
                 }
 
                 _this.loading = true;
 
                 _this.$axios.post('/api/login', _this.loginParams).then((res) => {
-                    console.log('post res: => ', res.data);
                     if (res.data.code === 0) {
                         setTimeout(()=>{
                             _this.loading = false;
@@ -73,6 +90,12 @@
                             message: res.data.message
                         });
                     }
+                }).catch((error)=>{
+                    _this.loading = false;
+                    _this.$q.dialog({
+                        title: error.response.status,
+                        message: error.response.data
+                    });
                 });
 
             }
