@@ -1,20 +1,35 @@
 <template>
-    <div class="parent-login">
-        <div class="login">
-            DASHBOARD
-
-        </div>
-
+    <div class="report-tree">
+        <q-tree
+            :nodes="report"
+            node-key="label" />
     </div>
 </template>
 
 <script>
 
     export default {
-        name: 'Dashboard',
+        name: 'REPORT',
         data () {
             return {
-
+                report: [
+                    {
+                        label: 'REPORT TREE',
+                        children: [
+                            {
+                                label: '2018-03-01'
+                            },
+                            {
+                                label: '2018-02-21',
+                                disabled: true
+                            },
+                            {
+                                label: '2018-02-14',
+                                disabled: true
+                            }
+                        ]
+                    }
+                ]
             }
         },
         created () {
@@ -27,10 +42,10 @@
 </script>
 
 <style lang="less">
-    .login {
+    .report-tree {
         position:absolute;
-        width:200px;
-        height:300px;
+        width:400px;
+        height:500px;
         top:50%;
         left:50%;
         transform:translate(-50%,-50%);
