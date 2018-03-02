@@ -16,6 +16,10 @@ export default [
     path: '/login',
     component: () => import('components/login')
   },
+  {
+    path: '/dashboard',
+    component: () => import('components/dashboard')
+  },
 
   { // Always leave this as last one
     path: '*',
