@@ -64,7 +64,10 @@ module.exports = function (ctx) {
         'QField',
         'QInput',
         'QDialog',
-	    'QTree'
+	    'QTree',
+	    'QCollapsible',
+	    'QSelect',
+	    'QModal'
       ],
       directives: [
         'Ripple'
