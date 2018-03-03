@@ -19,6 +19,20 @@ const Router = new VueRouter({
   base: process.env.VUE_ROUTER_BASE,
   scrollBehavior: () => ({ y: 0 }),
   routes
-})
+});
+
+Router.beforeEach((to, from, next) => {
+  if (to.meta.requireAuth) {
+    const token = localStorage.getItem('token');
+    if (token && token !== 'null') {
+      Vue.prototype.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+      next();
+    } else {
+      next('/login');
+    }
+  } else {
+    next();
+  }
+});
 
 export default Router

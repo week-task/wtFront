@@ -18,7 +18,10 @@ export default [
   },
   {
     path: '/dashboard',
-    component: () => import('components/dashboard')
+    component: () => import('components/dashboard'),
+    meta: {
+      requireAuth: true
+    }
   },
 
   { // Always leave this as last one
