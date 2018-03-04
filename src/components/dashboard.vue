@@ -25,10 +25,10 @@
                 </q-field>
                 <q-field
                         class="form-field"
-                        :error="$v.taskForm.projectId.$error"
+                        :error="$v.taskForm.project_id.$error"
                         error-label="Required">
                     <q-select
-                            v-model="taskForm.projectId"
+                            v-model="taskForm.project_id"
                             float-label="所属项目"
                             :options="projectOptions"/>
                 </q-field>
@@ -112,8 +112,8 @@
                 ],
                 taskForm: {
                     name: '',
-                    userId: '',
-                    projectId: 1,
+                    user_id: '',
+                    project_id: 1,
                     progress: 0,
                     status: 0,
                     remark: '',
@@ -125,7 +125,7 @@
         validations: {
             taskForm: {
                 name: {required},
-                projectId: {required},
+                project_id: {required},
                 progress: {required},
                 status: {required},
                 remark: {}
@@ -137,6 +137,7 @@
         methods: {
             getInitData () {
                 const _this = this;
+                _this.taskForm.user_id = JSON.parse(localStorage.getItem('user'))._id;
                 _this.$axios.get('/api/getProjectList').then((res) => {
                     if (res.data.code === 0) {
                         let data = res.data.data;
@@ -146,12 +147,12 @@
                                 value: data[i]._id
                             });
                         }
-                        _this.taskForm.projectId = data[0]._id;
+                        _this.taskForm.project_id = data[0]._id;
                     }
-                }).catch((err) => {
+                }).catch((error) => {
                     _this.$q.dialog({
-                        title: 'Error',
-                        message: err.data.message
+                        title: error.response.status,
+                        message: error.response.data
                     });
                 });
             },
@@ -165,7 +166,7 @@
                     return;
                 }
                 _this.loading = true;
-                _this.$axios.post('/api/createTask', _this.loginParams).then((res) => {
+                _this.$axios.post('/api/task/add', _this.taskForm).then((res) => {
                     if (res.data.code === 0) {
                         const token = res.data.data.token;
                         setTimeout(()=>{

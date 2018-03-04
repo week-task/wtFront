@@ -79,12 +79,13 @@
 
                 _this.$axios.post('/api/login', _this.loginParams).then((res) => {
                     if (res.data.code === 0) {
-                        const token = res.data.data.token;
+                        const authInfo = res.data.data;
                         setTimeout(()=>{
                             _this.loading = false;
-                            localStorage.setItem('token', token);
+                            localStorage.setItem('user', JSON.stringify(authInfo.user));
+                            localStorage.setItem('token', authInfo.token);
                             // Bearer是JWT的头部认证
-                            _this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+                            _this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + authInfo.token;
                             window.location.href = '/dashboard';
                         }, 1000);
                     } else {
