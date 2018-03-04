@@ -46,6 +46,7 @@
                         :error="$v.taskForm.progress.$error"
                         error-label="Required">
                     <q-select
+                            v-if="taskForm.status != 2"
                             v-model="taskForm.progress"
                             float-label="进度"
                             :options="progressOptions"/>
@@ -78,6 +79,7 @@
         name: 'REPORT',
         data () {
             return {
+                isDeploy: false,
                 loading: false,
                 createTaskModal: false,
                 select: '2018-03-01',
@@ -111,13 +113,14 @@
                     {label: '100%', value: 100}
                 ],
                 taskForm: {
+                    id: '',
                     name: '',
                     user_id: '',
-                    project_id: 1,
+                    project_id: '',
                     progress: 0,
                     status: 0,
                     remark: '',
-                    createDate: '',
+                    create_date: '',
                     period: ''
                 }
             }
@@ -132,10 +135,10 @@
             }
         },
         created () {
-            this.getInitData();
+            this.initFormData();
         },
         methods: {
-            getInitData () {
+            initFormData () {
                 const _this = this;
                 _this.taskForm.user_id = JSON.parse(localStorage.getItem('user'))._id;
                 _this.$axios.get('/api/getProjectList').then((res) => {
@@ -147,17 +150,15 @@
                                 value: data[i]._id
                             });
                         }
-                        _this.taskForm.project_id = data[0]._id;
+//                        _this.taskForm.project_id = data[0]._id;
                     }
                 }).catch((error) => {
-                    _this.$q.dialog({
-                        title: error.response.status,
-                        message: error.response.data
-                    });
+                    _this.handleError(error);
                 });
             },
             createTask () {
                 this.createTaskModal = true;
+
             },
             saveTask () {
                 const _this = this;
@@ -165,16 +166,18 @@
                 if (_this.$v.taskForm.$error) {
                     return;
                 }
+                // 如果状态是已上线,那么进度默认为100
+                if (_this.taskForm.status === 2) {
+                    _this.taskForm.progress = 100;
+                }
                 _this.loading = true;
+
                 _this.$axios.post('/api/task/add', _this.taskForm).then((res) => {
                     if (res.data.code === 0) {
-                        const token = res.data.data.token;
                         setTimeout(()=>{
                             _this.loading = false;
-                            localStorage.setItem('token', token);
-                            // Bearer是JWT的头部认证
-                            _this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
-                            window.location.href = '/dashboard';
+                            _this.createTaskModal = false;
+                            _this.resetForm();
                         }, 1000);
                     } else {
                         _this.loading = false;
@@ -184,11 +187,40 @@
                         });
                     }
                 }).catch((error)=>{
-                    _this.loading = false;
-                    _this.$q.dialog({
-                        title: error.response.status,
-                        message: error.response.data
-                    });
+                    _this.handleError(error);
+                });
+            },
+            checkProgress () {
+                const _this = this;
+                if (_this.taskForm.status = 2) {
+                    _this.isDeploy = true;
+                    _this.taskForm.progress = 100;
+                } else {
+                    _this.isDeploy = false;
+                    _this.taskForm.progress = 0;
+                }
+            },
+            resetForm () {
+                const _this = this;
+                _this.taskForm.id = '';
+                _this.taskForm.name = '';
+                _this.taskForm.user_id = '';
+                _this.taskForm.project_id = '';
+                _this.taskForm.progress = 0;
+                _this.taskForm.status = 0;
+                _this.taskForm.remark = '';
+                _this.taskForm.create_date = '';
+                _this.taskForm.period = '';
+            },
+            handleError (error) {
+                let isExpired = error.response.data.error === 'jwt expired';
+                this.$q.dialog({
+                    title: error.response.status,
+                    message: isExpired ? 'token已过期,重新登录' : error.response.data.error
+                }).then(() => {
+                    if (isExpired) {
+                        window.location.href = '/login';
+                    }
                 });
             }
         }

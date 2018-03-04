@@ -67,7 +67,11 @@ module.exports = function (ctx) {
 	    'QTree',
 	    'QCollapsible',
 	    'QSelect',
-	    'QModal'
+	    'QModal',
+	    'QTable',
+	    'QTh',
+	    'QTr',
+	    'QTd'
       ],
       directives: [
         'Ripple'
