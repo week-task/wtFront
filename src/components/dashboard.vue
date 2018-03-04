@@ -6,13 +6,24 @@
             class="report-tree-select"/>
 
         <q-btn label="CREATE TASK" @click="createTask" class="btn-create" />
-        <q-collapsible v-for="(item, index) in projects" popup icon="layers" :label="item.name" :key="index">
+        <q-collapsible v-for="(item, index) in tableData" popup icon="layers" :label="item.project" :key="index">
             <div>
-                Content
+                <q-table
+                    :data="item.data"
+                    :columns="columns"
+                    selection="single"
+                    :selected.sync="item.selected"
+                    color="primary"
+                    table-class="task-table">
+                    <template slot="top-selection" slot-scope="props">
+                        <q-btn color="positive" flat icon="mode edit" label="编辑" @click="editTask"  />
+                        <q-btn color="negative" flat delete icon="delete" label="删除" @click="deleteTask" />
+                    </template>
+                </q-table>
             </div>
         </q-collapsible>
 
-        <q-modal v-model="createTaskModal" :content-css="{padding: '50px', minWidth: '30%'}">
+        <q-modal v-model="createTaskModal" :content-css="{padding: '50px', minWidth: '500px'}">
             <!--<div class="q-display-1 q-mb-md">Create Task</div>-->
             <div>
                 <q-field
@@ -122,7 +133,86 @@
                     remark: '',
                     create_date: '',
                     period: ''
-                }
+                },
+                columns: [
+                    {name: '任务名称', label: '任务名称', field: 'name', align: 'left'},
+                    {name: '状态', label: '状态', field: 'status'},
+                    {name: '进度', label: '进度', field: 'progress'}
+                ],
+                tableDataMock: [{
+                    project: '门户',
+                    selected: [],
+                    data: [
+                        {
+                            id: 1,
+                            name: 'medadwa',
+                            progress: 100,
+                            status: 0
+                        },{
+                            id: 2,
+                            name: 'medadwa2',
+                            progress: 60,
+                            status: 1
+                        },{
+                            id: 3,
+                            name: 'medadwasada',
+                            progress: 10,
+                            status: 2
+                        },{
+                            id: 11,
+                            name: 'medadwa',
+                            progress: 100,
+                            status: 0
+                        },{
+                            id: 12,
+                            name: 'medadwa2',
+                            progress: 60,
+                            status: 1
+                        },{
+                            id: 13,
+                            name: 'medadwasada',
+                            progress: 10,
+                            status: 2
+                        },{
+                            id: 21,
+                            name: 'medadwa',
+                            progress: 100,
+                            status: 0
+                        },{
+                            id: 22,
+                            name: 'medadwa2',
+                            progress: 60,
+                            status: 1
+                        },{
+                            id: 23,
+                            name: 'medadwasada',
+                            progress: 10,
+                            status: 2
+                        }
+                    ]
+                },{
+                    project: '开发者中心',
+                    selected: [],
+                    data: [
+                        {
+                            id: 4,
+                            name: 'medadwa',
+                            progress: 100,
+                            status: 0
+                        },{
+                            id: 5,
+                            name: 'medadwa2',
+                            progress: 60,
+                            status: 1
+                        },{
+                            id: 6,
+                            name: 'medadwasada',
+                            progress: 10,
+                            status: 2
+                        },
+                    ]
+                }],
+                tableData: []
             }
         },
         validations: {
@@ -141,6 +231,7 @@
             initFormData () {
                 const _this = this;
                 _this.taskForm.user_id = JSON.parse(localStorage.getItem('user'))._id;
+                _this.getReportData();
                 _this.$axios.get('/api/getProjectList').then((res) => {
                     if (res.data.code === 0) {
                         let data = res.data.data;
@@ -151,6 +242,24 @@
                             });
                         }
 //                        _this.taskForm.project_id = data[0]._id;
+                    }
+                }).catch((error) => {
+                    _this.handleError(error);
+                });
+            },
+            getReportData () {
+                const _this = this;
+                const user = JSON.parse(localStorage.getItem('user'));
+                let queryParams = {
+                    period: 10,
+                    username: user.name,
+                    userrole: user.role,
+                    userid: user._id
+                };
+                _this.$axios.post('/api/getTaskListByPeriod', queryParams).then((res) => {
+                    if (res.data.code === 0) {
+                        console.log('report data: => ', res.data);
+                        _this.tableData = res.data.data;
                     }
                 }).catch((error) => {
                     _this.handleError(error);
@@ -174,6 +283,7 @@
 
                 _this.$axios.post('/api/task/add', _this.taskForm).then((res) => {
                     if (res.data.code === 0) {
+                        _this.getReportData();
                         setTimeout(()=>{
                             _this.loading = false;
                             _this.createTaskModal = false;
@@ -190,21 +300,27 @@
                     _this.handleError(error);
                 });
             },
-            checkProgress () {
-                const _this = this;
-                if (_this.taskForm.status = 2) {
-                    _this.isDeploy = true;
-                    _this.taskForm.progress = 100;
-                } else {
-                    _this.isDeploy = false;
-                    _this.taskForm.progress = 0;
-                }
+            editTask () {
+                console.log('edit');
             },
+            deleteTask () {
+                console.log('delete');
+            },
+//            checkProgress () {
+//                const _this = this;
+//                if (_this.taskForm.status = 2) {
+//                    _this.isDeploy = true;
+//                    _this.taskForm.progress = 100;
+//                } else {
+//                    _this.isDeploy = false;
+//                    _this.taskForm.progress = 0;
+//                }
+//            },
             resetForm () {
                 const _this = this;
                 _this.taskForm.id = '';
                 _this.taskForm.name = '';
-                _this.taskForm.user_id = '';
+//                _this.taskForm.user_id = '';
                 _this.taskForm.project_id = '';
                 _this.taskForm.progress = 0;
                 _this.taskForm.status = 0;
@@ -230,8 +346,8 @@
 <style lang="less">
     .report-tree {
         position:absolute;
-        width:400px;
-        height:500px;
+        width:600px;
+        height:auto;
         top:50%;
         left:50%;
         transform:translate(-50%,-50%);
@@ -252,5 +368,20 @@
 
     .form-field {
         margin: 12px 0;
+    }
+    .q-table-container {
+        -webkit-box-shadow: none;
+        -moz-box-shadow: none;
+        box-shadow: none;
+    }
+    .task-table {
+        border: none;
+    }
+    .q-table-top {
+        position: absolute;
+        top: -45px;
+        right: 50px;
+        min-height: 0;
+        padding: 0;
     }
 </style>

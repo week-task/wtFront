@@ -79,7 +79,8 @@ module.exports = function (ctx) {
       plugins: [
         'Notify',
         'Dialog'
-      ]
+      ],
+	  i18n: 'zh-hans'
     },
     // animations: 'all' --- includes all animations
     animations: [

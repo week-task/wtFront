@@ -89,6 +89,7 @@
                             window.location.href = '/dashboard';
                         }, 1000);
                     } else {
+                        console.log(res);
                         _this.loading = false;
                         _this.$q.dialog({
                             title: 'Error',
@@ -96,10 +97,11 @@
                         });
                     }
                 }).catch((error)=>{
+                    console.log(error);
                     _this.loading = false;
                     _this.$q.dialog({
                         title: error.response.status,
-                        message: error.response.data
+                        message: error.response.data.message
                     });
                 });
 
