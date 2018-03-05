@@ -402,8 +402,44 @@
                 _this.createTaskModal = true;
                 _this.isEdit = true;
             },
-            deleteTask () {
-                console.log('delete');
+            deleteTask (props) {
+                const _this = this;
+                this.$q.dialog({
+                    title: '确认',
+                    message: '确认删除该任务吗?',
+                    ok: '删除',
+                    cancel: '再考虑考虑'
+                }).then(() => {
+                    _this.$axios.post('/api/task/del', {
+                        id: props[0].id,
+                        user_id: JSON.parse(localStorage.getItem('user'))._id
+                    }).then((res) => {
+                        if (res.data.code === 0) {
+                            _this.getReportData();
+                            _this.$q.notify({
+                                message: '已删除,这下真没了!',
+                                timeout: 2000,
+                                type: 'positive',
+                                position: 'top'
+                            });
+                        } else {
+                            _this.loading = false;
+                            _this.$q.dialog({
+                                title: 'Error',
+                                message: res.data.message
+                            });
+                        }
+                    }).catch((error)=>{
+                        _this.handleError(error);
+                    });
+                }).catch(() => {
+                    _this.$q.notify({
+                        message: '看来你是一个很谨慎的人!',
+                        timeout: 2000,
+                        type: 'info',
+                        position: 'top'
+                    });
+                })
             },
             createProject () {
                 this.createProjectModal = true;
@@ -471,6 +507,7 @@
                     });
                 } else {
                     this.loading = false;
+                    this.loadingProject = false;
                     this.$q.dialog({
                         title: error.response.status + '',
                         message: error.response.data.message
