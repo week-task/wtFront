@@ -397,7 +397,7 @@
                 _this.taskForm.progress = props[0].progress;
                 _this.taskForm.project_id = props[0].project._id;
                 _this.taskForm.status = parseInt(props[0].status);
-                _this.taskForm.user_id = props[0].user._id;
+                _this.taskForm.user_id = JSON.parse(localStorage.getItem('user'))._id;
                 _this.taskForm.remark = props[0].remark;
                 _this.createTaskModal = true;
                 _this.isEdit = true;
@@ -460,14 +460,24 @@
             },
             handleError (error) {
                 let isExpired = error.response.data.error === 'jwt expired';
-                this.$q.dialog({
-                    title: error.response.status,
-                    message: isExpired ? 'token已过期,重新登录' : error.response.data.error
-                }).then(() => {
-                    if (isExpired) {
-                        window.location.href = '/login';
-                    }
-                });
+                if (error.response.status !== 500) {
+                    this.$q.dialog({
+                        title: error.response.status + '',
+                        message: isExpired ? 'token已过期,重新登录' : error.response.data.error
+                    }).then(() => {
+                        if (isExpired) {
+                            window.location.href = '/login';
+                        }
+                    });
+                } else {
+                    this.loading = false;
+                    this.$q.dialog({
+                        title: error.response.status + '',
+                        message: error.response.data.message
+                    });
+                }
+
+
             }
         }
     }
