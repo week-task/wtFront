@@ -2,18 +2,21 @@
     <div class="report-tree">
         <q-select
             v-model="select"
-            :options="selectOptions"
+            :options="periodOptions"
             class="report-tree-select"/>
 
-        <q-btn label="CREATE TASK" @click="createTask" class="btn-create" />
+        <q-btn icon="file download" label="EXPORT" @click="exportExcel" class="btn-create" v-if="isAdmin" />
+        <q-btn icon="add" label="PROJECT" @click="createProject" class="btn-create" v-if="showUser" />
+        <q-btn icon="add" label="TASK" @click="createTask" class="btn-create" />
         <q-collapsible v-for="(item, index) in tableData" popup icon="layers" :label="item.project" :key="index">
             <div>
                 <q-table
                     :data="item.data"
-                    :columns="columns"
+                    :columns="showUser ? columnsLeader : columns"
                     selection="single"
                     :selected.sync="item.selected"
                     color="primary"
+                    no-data-label="暂无数据"
                     table-class="task-table">
                     <template slot="top-selection" slot-scope="props">
                         <q-btn color="positive" flat icon="mode edit" label="编辑" @click="editTask"  />
@@ -24,7 +27,7 @@
         </q-collapsible>
 
         <q-modal v-model="createTaskModal" :content-css="{padding: '50px', minWidth: '500px'}">
-            <!--<div class="q-display-1 q-mb-md">Create Task</div>-->
+            <div class="q-display-1 q-mb-md">创建任务</div>
             <div>
                 <q-field
                         class="form-field"
@@ -76,30 +79,60 @@
                     color="primary"
                     class="btn-save"
                     @click="saveTask">
-                SAVE
+                保存
                 <q-spinner-hourglass slot="loading" size="20px" />
                 <span slot="loading">Loading...</span>
             </q-btn>
+        </q-modal>
+
+        <q-modal v-model="createProjectModal" :content-css="{padding: '50px', minWidth: '500px'}">
+            <div class="q-display-1 q-mb-md">创建项目</div>
+            <div>
+                <q-field
+                        class="form-field"
+                        :error="$v.projectForm.name.$error"
+                        error-label="Required">
+                    <q-input float-label="项目名称"
+                             @input="$v.projectForm.name.$touch"
+                             v-model="projectForm.name" />
+                </q-field>
+                <q-btn
+                        :loading="loadingProject"
+                        color="primary"
+                        class="btn-save"
+                        @click="saveProject">
+                    保存
+                    <q-spinner-hourglass slot="loading" size="20px" />
+                    <span slot="loading">Loading...</span>
+                </q-btn>
+            </div>
         </q-modal>
     </div>
 </template>
 
 <script>
     import {required, minLength} from 'vuelidate/lib/validators';
+    import {date} from 'quasar';
     export default {
         name: 'REPORT',
         data () {
             return {
                 isDeploy: false,
+                isAdmin: false, // 判断是否是超级管理员
+                showUser: false, // 判断是否是二级管理员
                 loading: false,
+                loadingProject: false,
                 createTaskModal: false,
+                createProjectModal: false,
+                weekOfYear: '',
                 select: '2018-03-01',
                 selectOptions: [
                     {label: '2018-03-01', value: '2018-03-01'},
                     {label: '2018-02-20', value: '2018-02-20'},
                     {label: '2018-02-13', value: '2018-02-13'}
                 ],
-                projects: [
+                periodOptions: [],
+                projectsMock: [
                     {id: 1, name: 'Portal'},
                     {id: 2, name: 'Admin'},
                     {id: 3, name: 'Mini Programs'}
@@ -134,10 +167,19 @@
                     create_date: '',
                     period: ''
                 },
+                projectForm: {
+                    name: ''
+                },
                 columns: [
                     {name: '任务名称', label: '任务名称', field: 'name', align: 'left'},
                     {name: '状态', label: '状态', field: 'status'},
                     {name: '进度', label: '进度', field: 'progress'}
+                ],
+                columnsLeader: [
+                    {name: '任务名称', label: '任务名称', field: 'name', align: 'left'},
+                    {name: '状态', label: '状态', field: 'status'},
+                    {name: '进度', label: '进度', field: 'progress'},
+                    {name: '责任人', label: '责任人', field: 'username'}
                 ],
                 tableDataMock: [{
                     project: '门户',
@@ -212,7 +254,11 @@
                         },
                     ]
                 }],
-                tableData: []
+                tableData: [{
+                    project: '暂无数据',
+                    selected: [],
+                    data: []
+                }]
             }
         },
         validations: {
@@ -222,16 +268,44 @@
                 progress: {required},
                 status: {required},
                 remark: {}
+            },
+            projectForm: {
+                name: {required}
             }
         },
         created () {
             this.initFormData();
         },
+        watch: {
+            select: function () {
+                this.weekOfYear = this.select;
+                this.getReportData();
+            }
+        },
         methods: {
             initFormData () {
                 const _this = this;
-                _this.taskForm.user_id = JSON.parse(localStorage.getItem('user'))._id;
+                const user = JSON.parse(localStorage.getItem('user'));
+                _this.isAdmin = user.role === 0;
+                _this.showUser = user.role !== 2;
+                _this.taskForm.user_id = user._id;
+                _this.getWeekOfYear();
+                _this.renderPeriods();
                 _this.getReportData();
+                _this.getProjectsList();
+            },
+            renderPeriods () {
+                for (let i = parseInt(this.weekOfYear); i > 8; i--) {
+                    this.periodOptions.push({
+                        label: (this.isAdmin ? '' : JSON.parse(localStorage.getItem('user')).name + ' ') + '第'+ i + '期周报',
+                        value: i
+                    });
+                }
+                this.select = parseInt(this.weekOfYear);
+            },
+            getProjectsList () {
+                const _this = this;
+                _this.projectOptions = [];
                 _this.$axios.get('/api/getProjectList').then((res) => {
                     if (res.data.code === 0) {
                         let data = res.data.data;
@@ -241,7 +315,6 @@
                                 value: data[i]._id
                             });
                         }
-//                        _this.taskForm.project_id = data[0]._id;
                     }
                 }).catch((error) => {
                     _this.handleError(error);
@@ -250,8 +323,10 @@
             getReportData () {
                 const _this = this;
                 const user = JSON.parse(localStorage.getItem('user'));
+//                const timexx = Date.now();
+//                console.log('week of year: ', date.formatDate(timexx, 'w'));
                 let queryParams = {
-                    period: 10,
+                    period: _this.weekOfYear,
                     username: user.name,
                     userrole: user.role,
                     userid: user._id
@@ -259,15 +334,27 @@
                 _this.$axios.post('/api/getTaskListByPeriod', queryParams).then((res) => {
                     if (res.data.code === 0) {
                         console.log('report data: => ', res.data);
-                        _this.tableData = res.data.data;
+                        if (res.data.data.length > 0) {
+                            _this.tableData = res.data.data;
+                        } else if (res.data.data.length === 0) {
+                            _this.$q.dialog({
+                                title: '提示',
+                                message: '第'+ _this.weekOfYear + '期周报暂无数据'
+                            });
+                            _this.getWeekOfYear();
+                            _this.select = parseInt(_this.weekOfYear);
+                        }
                     }
                 }).catch((error) => {
                     _this.handleError(error);
                 });
             },
+            getWeekOfYear () {
+                let tempWeekOfYear = date.formatDate(Date.now(), 'w');
+                this.weekOfYear = date.formatDate(Date.now(), 'd') === 0 ? tempWeekOfYear + 1 : tempWeekOfYear;
+            },
             createTask () {
                 this.createTaskModal = true;
-
             },
             saveTask () {
                 const _this = this;
@@ -306,6 +393,36 @@
             deleteTask () {
                 console.log('delete');
             },
+            createProject () {
+                this.createProjectModal = true;
+            },
+            saveProject () {
+                const _this = this;
+                _this.$v.projectForm.$touch();
+                if (_this.$v.projectForm.$error) {
+                    return;
+                }
+                _this.loadingProject = true;
+                _this.$axios.post('/api/project/add', _this.projectForm).then((res) => {
+                    if (res.data.code === 0) {
+                        _this.getProjectsList();
+                        setTimeout(()=>{
+                            _this.loadingProject = false;
+                            _this.createProjectModal = false;
+                            _this.projectForm.name = '';
+                        }, 1000);
+                    } else {
+                        _this.loading = false;
+                        _this.$q.dialog({
+                            title: 'Error',
+                            message: res.data.message
+                        });
+                    }
+                }).catch((error)=>{
+                    _this.handleError(error);
+                });
+            },
+            exportExcel () {},
 //            checkProgress () {
 //                const _this = this;
 //                if (_this.taskForm.status = 2) {
@@ -353,14 +470,17 @@
         transform:translate(-50%,-50%);
     }
     .report-tree-select {
-        width: 120px;
-        margin: 0 0 10px 15px;
+        /*width: 160px;*/
+        position: absolute;
+        right: 15px;
+        top: -10px;
+        margin: 0;
     }
     .btn-create {
-        float: right;
-        position: absolute;
-        top: -5px;
-        right: 15px;
+        position: relative;
+        top: -15px;
+        left: 15px;
+        display: inline-block;
     }
     .btn-save {
         margin-top: 10px;
