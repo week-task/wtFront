@@ -19,15 +19,16 @@
                     no-data-label="暂无数据"
                     table-class="task-table">
                     <template slot="top-selection" slot-scope="props">
-                        <q-btn color="positive" flat icon="mode edit" label="编辑" @click="editTask"  />
-                        <q-btn color="negative" flat delete icon="delete" label="删除" @click="deleteTask" />
+                        <q-btn color="positive" flat icon="mode edit" label="编辑" @click="editTask(item.selected)"  />
+                        <q-btn color="negative" flat delete icon="delete" label="删除" @click="deleteTask(item.selected)" />
                     </template>
                 </q-table>
             </div>
         </q-collapsible>
 
-        <q-modal v-model="createTaskModal" :content-css="{padding: '50px', minWidth: '500px'}">
-            <div class="q-display-1 q-mb-md">创建任务</div>
+        <q-modal v-model="createTaskModal" @hide="resetForm" :content-css="{padding: '50px', minWidth: '500px'}">
+            <div v-if="!isEdit" class="q-display-1 q-mb-md">创建任务</div>
+            <div v-if="isEdit" class="q-display-1 q-mb-md">编辑任务</div>
             <div>
                 <q-field
                         class="form-field"
@@ -118,6 +119,7 @@
         data () {
             return {
                 isDeploy: false,
+                isEdit: false, // task是否处于编辑状态
                 isAdmin: false, // 判断是否是超级管理员
                 showUser: false, // 判断是否是二级管理员
                 loading: false,
@@ -164,7 +166,6 @@
                     progress: 0,
                     status: 0,
                     remark: '',
-                    create_date: '',
                     period: ''
                 },
                 projectForm: {
@@ -172,13 +173,13 @@
                 },
                 columns: [
                     {name: '任务名称', label: '任务名称', field: 'name', align: 'left'},
-                    {name: '状态', label: '状态', field: 'status'},
-                    {name: '进度', label: '进度', field: 'progress'}
+                    {name: '状态', label: '状态', field: 'statusZh'},
+                    {name: '进度', label: '进度', field: 'progressPercent'}
                 ],
                 columnsLeader: [
                     {name: '任务名称', label: '任务名称', field: 'name', align: 'left'},
-                    {name: '状态', label: '状态', field: 'status'},
-                    {name: '进度', label: '进度', field: 'progress'},
+                    {name: '状态', label: '状态', field: 'statusZh'},
+                    {name: '进度', label: '进度', field: 'progressPercent'},
                     {name: '责任人', label: '责任人', field: 'username'}
                 ],
                 tableDataMock: [{
@@ -368,12 +369,13 @@
                 }
                 _this.loading = true;
 
-                _this.$axios.post('/api/task/add', _this.taskForm).then((res) => {
+                _this.$axios.post(_this.isEdit ? '/api/task/edit' : '/api/task/add', _this.taskForm).then((res) => {
                     if (res.data.code === 0) {
                         _this.getReportData();
                         setTimeout(()=>{
                             _this.loading = false;
                             _this.createTaskModal = false;
+                            _this.isEdit = false;
                             _this.resetForm();
                         }, 1000);
                     } else {
@@ -387,8 +389,18 @@
                     _this.handleError(error);
                 });
             },
-            editTask () {
-                console.log('edit');
+            editTask (props) {
+                const _this = this;
+                _this.taskForm.id = props[0].id;
+                _this.taskForm.name = props[0].name;
+                _this.taskForm.period = props[0].period;
+                _this.taskForm.progress = props[0].progress;
+                _this.taskForm.project_id = props[0].project._id;
+                _this.taskForm.status = parseInt(props[0].status);
+                _this.taskForm.user_id = props[0].user._id;
+                _this.taskForm.remark = props[0].remark;
+                _this.createTaskModal = true;
+                _this.isEdit = true;
             },
             deleteTask () {
                 console.log('delete');
@@ -444,6 +456,7 @@
                 _this.taskForm.remark = '';
                 _this.taskForm.create_date = '';
                 _this.taskForm.period = '';
+                _this.isEdit = false;
             },
             handleError (error) {
                 let isExpired = error.response.data.error === 'jwt expired';
