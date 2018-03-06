@@ -301,7 +301,6 @@
             checkFinished () {
                 const _this = this;
                 _this.$axios.post('/api/isFinished', {user_id: _this.user._id}).then((res) => {
-                    console.log('check finished ::: ', res);
                     if (res.data.code === 0) {
                         _this.$q.notify({
                             message: res.data.message,
@@ -345,8 +344,6 @@
             getReportData () {
                 const _this = this;
 //                const user = JSON.parse(localStorage.getItem('user'));
-//                const timexx = Date.now();
-//                console.log('week of year: ', date.formatDate(timexx, 'w'));
                 let queryParams = {
                     period: _this.weekOfYear,
                     username: _this.user.name,
@@ -355,7 +352,6 @@
                 };
                 _this.$axios.post('/api/getTaskListByPeriod', queryParams).then((res) => {
                     if (res.data.code === 0) {
-                        console.log('report data: => ', res.data);
                         if (res.data.data.length > 0) {
                             _this.tableData = res.data.data;
                         } else if (res.data.data.length === 0) {
@@ -389,7 +385,6 @@
                     _this.taskForm.progress = 100;
                 }
                 _this.loading = true;
-
                 _this.$axios.post(_this.isEdit ? '/api/task/edit' : '/api/task/add', _this.taskForm).then((res) => {
                     if (res.data.code === 0) {
                         _this.getReportData();
@@ -491,17 +486,20 @@
                     _this.handleError(error);
                 });
             },
-            exportExcel () {},
-//            checkProgress () {
-//                const _this = this;
-//                if (_this.taskForm.status = 2) {
-//                    _this.isDeploy = true;
-//                    _this.taskForm.progress = 100;
-//                } else {
-//                    _this.isDeploy = false;
-//                    _this.taskForm.progress = 0;
-//                }
-//            },
+            exportExcel () {
+                this.$axios.get('/api/export').then((res) => {
+                    if (res.data.code === 0) {
+                        window.open('http://localhost:1234/'+res.data.data.url);
+                    }
+                }).catch((err)=>{
+                    this.$q.notify({
+                        message: err.response.data.message,
+                        timeout: 2000,
+                        type: 'info',
+                        position: 'top'
+                    });
+                });
+            },
             resetForm () {
                 const _this = this;
                 _this.taskForm.id = '';
@@ -534,8 +532,6 @@
                         message: error.response.data.message
                     });
                 }
-
-
             }
         }
     }
