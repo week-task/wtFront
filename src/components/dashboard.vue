@@ -7,7 +7,7 @@
 
         <q-btn icon="file download" label="EXPORT" @click="exportExcel" class="btn-create" v-if="isAdmin" />
         <q-btn icon="add" label="PROJECT" @click="createProject" class="btn-create" v-if="showUser" />
-        <q-btn icon="add" label="TASK" @click="createTask" class="btn-create" />
+        <q-btn icon="add" label="TASK" @click="createTask" class="btn-create" v-if="!historyTask" />
         <q-collapsible v-for="(item, index) in tableData" popup icon="layers" :label="item.project" :key="index">
             <div>
                 <q-table
@@ -122,11 +122,13 @@
                 isEdit: false, // task是否处于编辑状态
                 isAdmin: false, // 判断是否是超级管理员
                 showUser: false, // 判断是否是二级管理员
+                historyTask: false,
                 loading: false,
                 loadingProject: false,
                 createTaskModal: false,
                 createProjectModal: false,
                 weekOfYear: '',
+                user: {},
                 select: '2018-03-01',
                 selectOptions: [
                     {label: '2018-03-01', value: '2018-03-01'},
@@ -286,23 +288,42 @@
         methods: {
             initFormData () {
                 const _this = this;
-                const user = JSON.parse(localStorage.getItem('user'));
-                _this.isAdmin = user.role === 0;
-                _this.showUser = user.role !== 2;
-                _this.taskForm.user_id = user._id;
+                _this.user = JSON.parse(localStorage.getItem('user'));
+                _this.isAdmin = _this.user.role === 0;
+                _this.showUser = _this.user.role !== 2;
+                _this.taskForm.user_id = _this.user._id;
+                _this.checkFinished();
                 _this.getWeekOfYear();
                 _this.renderPeriods();
-                _this.getReportData();
+//                _this.getReportData();
                 _this.getProjectsList();
             },
+            checkFinished () {
+                const _this = this;
+                _this.$axios.post('/api/isFinished', {user_id: _this.user._id}).then((res) => {
+                    console.log('check finished ::: ', res);
+                    if (res.data.code === 0) {
+                        _this.$q.notify({
+                            message: res.data.message,
+                            timeout: 2000,
+                            type: 'positive',
+                            position: 'top'
+                        });
+                        _this.getReportData();
+                    }
+                }).catch((error) => {
+                    _this.handleError(error);
+                });
+            },
             renderPeriods () {
-                for (let i = parseInt(this.weekOfYear); i > 8; i--) {
-                    this.periodOptions.push({
-                        label: (this.isAdmin ? '' : JSON.parse(localStorage.getItem('user')).name + ' ') + '第'+ i + '期周报',
+                const _this = this;
+                for (let i = parseInt(_this.weekOfYear); i > 8; i--) {
+                    _this.periodOptions.push({
+                        label: (_this.isAdmin ? '' : _this.user.name + ' ') + '第'+ i + '期周报',
                         value: i
                     });
                 }
-                this.select = parseInt(this.weekOfYear);
+                _this.select = parseInt(_this.weekOfYear);
             },
             getProjectsList () {
                 const _this = this;
@@ -323,14 +344,14 @@
             },
             getReportData () {
                 const _this = this;
-                const user = JSON.parse(localStorage.getItem('user'));
+//                const user = JSON.parse(localStorage.getItem('user'));
 //                const timexx = Date.now();
 //                console.log('week of year: ', date.formatDate(timexx, 'w'));
                 let queryParams = {
                     period: _this.weekOfYear,
-                    username: user.name,
-                    userrole: user.role,
-                    userid: user._id
+                    username: _this.user.name,
+                    userrole: _this.user.role,
+                    userid: _this.user._id
                 };
                 _this.$axios.post('/api/getTaskListByPeriod', queryParams).then((res) => {
                     if (res.data.code === 0) {
@@ -397,7 +418,7 @@
                 _this.taskForm.progress = props[0].progress;
                 _this.taskForm.project_id = props[0].project._id;
                 _this.taskForm.status = parseInt(props[0].status);
-                _this.taskForm.user_id = JSON.parse(localStorage.getItem('user'))._id;
+                _this.taskForm.user_id = _this.user._id;
                 _this.taskForm.remark = props[0].remark;
                 _this.createTaskModal = true;
                 _this.isEdit = true;
@@ -412,7 +433,7 @@
                 }).then(() => {
                     _this.$axios.post('/api/task/del', {
                         id: props[0].id,
-                        user_id: JSON.parse(localStorage.getItem('user'))._id
+                        user_id: _this.user._id
                     }).then((res) => {
                         if (res.data.code === 0) {
                             _this.getReportData();
