@@ -2,11 +2,8 @@
 
 export default [
   {
-    path: '/',
-    component: () => import('layouts/default'),
-    children: [
-      { path: '', component: () => import('pages/index') }
-    ]
+    path: '/tmp',
+    component: () => import('layouts/default')
   },
   {
     path: '/test',
@@ -17,7 +14,7 @@ export default [
     component: () => import('components/login')
   },
   {
-    path: '/dashboard',
+    path: '/',
     component: () => import('components/dashboard'),
     meta: {
       requireAuth: true
