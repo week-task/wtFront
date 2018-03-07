@@ -33,15 +33,16 @@
                 <q-field
                         class="form-field"
                         :error="$v.taskForm.name.$error"
-                        error-label="Required">
+                        :error-label="$v.taskForm.name.maxLength ? errMessage.requireInfo : errMessage.maxInfo">
                     <q-input float-label="任务名称"
                              @input="$v.taskForm.name.$touch"
                              v-model="taskForm.name" />
+                    <!--<span class="form-group__message" v-if="!$v.taskForm.name.maxLength">任务长度不宜超过 {{$v.taskForm.name.$params.maxLength.max}} 字符.</span>-->
                 </q-field>
                 <q-field
                         class="form-field"
                         :error="$v.taskForm.project_id.$error"
-                        error-label="Required">
+                        :error-label="errMessage.requireInfo">
                     <q-select
                             v-model="taskForm.project_id"
                             float-label="所属项目"
@@ -50,7 +51,7 @@
                 <q-field
                         class="form-field"
                         :error="$v.taskForm.status.$error"
-                        error-label="Required">
+                        :error-label="errMessage.requireInfo">
                     <q-select
                             v-model="taskForm.status"
                             float-label="状态"
@@ -59,7 +60,7 @@
                 <q-field
                         class="form-field"
                         :error="$v.taskForm.progress.$error"
-                        error-label="Required">
+                        :error-label="errMessage.requireInfo">
                     <q-select
                             v-if="taskForm.status != 2"
                             v-model="taskForm.progress"
@@ -69,7 +70,7 @@
                 <q-field
                         class="form-field"
                         :error="$v.taskForm.remark.$error"
-                        error-label="Required">
+                        :error-label="errMessage.requireInfo">
                     <q-input float-label="备注"
                              @input="$v.taskForm.remark.$touch"
                              v-model="taskForm.remark" />
@@ -112,7 +113,7 @@
 </template>
 
 <script>
-    import {required, minLength} from 'vuelidate/lib/validators';
+    import {required, minLength, maxLength} from 'vuelidate/lib/validators';
     import {date} from 'quasar';
     export default {
         name: 'REPORT',
@@ -172,6 +173,10 @@
                 },
                 projectForm: {
                     name: ''
+                },
+                errMessage: {
+                    requireInfo: '必填',
+                    maxInfo: '任务名称不宜超过30个字符'
                 },
                 columns: [
                     {name: '任务名称', label: '任务名称', field: 'name', align: 'left'},
@@ -266,7 +271,7 @@
         },
         validations: {
             taskForm: {
-                name: {required},
+                name: {required, maxLength: maxLength(30)},
                 project_id: {required},
                 progress: {required},
                 status: {required},
@@ -487,7 +492,7 @@
                 });
             },
             exportExcel () {
-                this.$axios.get('/api/export').then((res) => {
+                this.$axios.post('/api/export', {period: this.weekOfYear}).then((res) => {
                     if (res.data.code === 0) {
                         window.open('http://localhost:1234/'+res.data.data.url);
                     }

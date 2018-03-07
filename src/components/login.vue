@@ -1,18 +1,18 @@
 <template>
     <div class="login">
-        WEEKLY REPORT
+        前端团队周报系统
         <q-field
                 :error="$v.loginParams.username.$error"
-                error-label="Required">
-            <q-input float-label="username"
+                error-label="必填">
+            <q-input float-label="大名"
                      @input="$v.loginParams.username.$touch"
                      v-model="loginParams.username" />
         </q-field>
 
         <q-field
                 :error="$v.loginParams.password.$error"
-                error-label="Required">
-            <q-input float-label="password"
+                error-label="必填">
+            <q-input float-label="密码"
                      type="password"
                      @input="$v.loginParams.password.$touch"
                      v-model="loginParams.password" />
@@ -29,9 +29,9 @@
                 color="primary"
                 class="btn-login"
                 @click="login">
-            Login
+            进入
             <q-spinner-hourglass slot="loading" size="20px" />
-            <span slot="loading">Loading...</span>
+            <span slot="loading">进入中...</span>
         </q-btn>
     </div>
 </template>
