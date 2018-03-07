@@ -309,7 +309,7 @@
                     if (res.data.code === 0) {
                         _this.$q.notify({
                             message: res.data.message,
-                            timeout: 2000,
+                            timeout: 3000,
                             type: 'positive',
                             position: 'top'
                         });
@@ -321,7 +321,7 @@
             },
             renderPeriods () {
                 const _this = this;
-                for (let i = parseInt(_this.weekOfYear); i > 8; i--) {
+                for (let i = parseInt(_this.weekOfYear); i > 9; i--) {
                     _this.periodOptions.push({
                         label: (_this.isAdmin ? '' : _this.user.name + ' ') + '第'+ i + '期周报',
                         value: i
@@ -360,10 +360,17 @@
                         if (res.data.data.length > 0) {
                             _this.tableData = res.data.data;
                         } else if (res.data.data.length === 0) {
-                            _this.$q.dialog({
-                                title: '提示',
-                                message: '第'+ _this.weekOfYear + '期周报暂无数据'
+//                            _this.$q.dialog({
+//                                title: '提示',
+//                                message: '第'+ _this.weekOfYear + '期周报暂无数据'
+//                            });
+                            _this.$q.notify({
+                                message: '第'+ _this.weekOfYear + '期周报暂无数据,会自动跳转到最新一期',
+                                timeout: 3000,
+                                type: 'positive',
+                                position: 'top'
                             });
+
                             _this.getWeekOfYear();
                             _this.select = parseInt(_this.weekOfYear);
                         }
@@ -393,6 +400,12 @@
                 _this.$axios.post(_this.isEdit ? '/weeklyreportapi/task/edit' : '/weeklyreportapi/task/add', _this.taskForm).then((res) => {
                     if (res.data.code === 0) {
                         _this.getReportData();
+                        _this.$q.notify({
+                            message: res.data.message,
+                            timeout: 3000,
+                            type: 'positive',
+                            position: 'top'
+                        });
                         setTimeout(()=>{
                             _this.loading = false;
                             _this.createTaskModal = false;
@@ -439,7 +452,7 @@
                             _this.getReportData();
                             _this.$q.notify({
                                 message: '已删除,这下真没了!',
-                                timeout: 2000,
+                                timeout: 3000,
                                 type: 'positive',
                                 position: 'top'
                             });
@@ -456,7 +469,7 @@
                 }).catch(() => {
                     _this.$q.notify({
                         message: '看来你是一个很谨慎的人!',
-                        timeout: 2000,
+                        timeout: 3000,
                         type: 'info',
                         position: 'top'
                     });
@@ -475,6 +488,12 @@
                 _this.$axios.post('/weeklyreportapi/project/add', _this.projectForm).then((res) => {
                     if (res.data.code === 0) {
                         _this.getProjectsList();
+                        _this.$q.notify({
+                            message: res.data.message,
+                            timeout: 3000,
+                            type: 'positive',
+                            position: 'top'
+                        });
                         setTimeout(()=>{
                             _this.loadingProject = false;
                             _this.createProjectModal = false;
@@ -494,12 +513,12 @@
             exportExcel () {
                 this.$axios.post('/weeklyreportapi/export', {period: this.weekOfYear}).then((res) => {
                     if (res.data.code === 0) {
-                        window.open('http://localhost:1234/'+res.data.data.url);
+                        window.open('https://www.ioteams.com/weeklyreport/#/'+res.data.data.url);
                     }
                 }).catch((err)=>{
                     this.$q.notify({
                         message: err.response.data.message,
-                        timeout: 2000,
+                        timeout: 3000,
                         type: 'info',
                         position: 'top'
                     });
