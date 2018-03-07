@@ -77,7 +77,7 @@
 
                 _this.loading = true;
 
-                _this.$axios.post('/api/login', _this.loginParams).then((res) => {
+                _this.$axios.post('/weeklyreportapi/login', _this.loginParams).then((res) => {
                     if (res.data.code === 0) {
                         const authInfo = res.data.data;
                         setTimeout(()=>{
@@ -86,7 +86,8 @@
                             localStorage.setItem('token', authInfo.token);
                             // Bearer是JWT的头部认证
                             _this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + authInfo.token;
-                            window.location.href = '/dashboard';
+                            _this.$router.push('/dashboard');
+//                            window.location.href = '/dashboard';
                         }, 1000);
                     } else {
                         console.log(res);

@@ -305,7 +305,7 @@
             },
             checkFinished () {
                 const _this = this;
-                _this.$axios.post('/api/isFinished', {user_id: _this.user._id}).then((res) => {
+                _this.$axios.post('/weeklyreportapi/isFinished', {user_id: _this.user._id}).then((res) => {
                     if (res.data.code === 0) {
                         _this.$q.notify({
                             message: res.data.message,
@@ -332,7 +332,7 @@
             getProjectsList () {
                 const _this = this;
                 _this.projectOptions = [];
-                _this.$axios.get('/api/getProjectList').then((res) => {
+                _this.$axios.get('/weeklyreportapi/getProjectList').then((res) => {
                     if (res.data.code === 0) {
                         let data = res.data.data;
                         for (let i = 0, size = data.length; i < size; i++) {
@@ -355,7 +355,7 @@
                     userrole: _this.user.role,
                     userid: _this.user._id
                 };
-                _this.$axios.post('/api/getTaskListByPeriod', queryParams).then((res) => {
+                _this.$axios.post('/weeklyreportapi/getTaskListByPeriod', queryParams).then((res) => {
                     if (res.data.code === 0) {
                         if (res.data.data.length > 0) {
                             _this.tableData = res.data.data;
@@ -390,7 +390,7 @@
                     _this.taskForm.progress = 100;
                 }
                 _this.loading = true;
-                _this.$axios.post(_this.isEdit ? '/api/task/edit' : '/api/task/add', _this.taskForm).then((res) => {
+                _this.$axios.post(_this.isEdit ? '/weeklyreportapi/task/edit' : '/weeklyreportapi/task/add', _this.taskForm).then((res) => {
                     if (res.data.code === 0) {
                         _this.getReportData();
                         setTimeout(()=>{
@@ -431,7 +431,7 @@
                     ok: '删除',
                     cancel: '再考虑考虑'
                 }).then(() => {
-                    _this.$axios.post('/api/task/del', {
+                    _this.$axios.post('/weeklyreportapi/task/del', {
                         id: props[0].id,
                         user_id: _this.user._id
                     }).then((res) => {
@@ -472,7 +472,7 @@
                     return;
                 }
                 _this.loadingProject = true;
-                _this.$axios.post('/api/project/add', _this.projectForm).then((res) => {
+                _this.$axios.post('/weeklyreportapi/project/add', _this.projectForm).then((res) => {
                     if (res.data.code === 0) {
                         _this.getProjectsList();
                         setTimeout(()=>{
@@ -492,7 +492,7 @@
                 });
             },
             exportExcel () {
-                this.$axios.post('/api/export', {period: this.weekOfYear}).then((res) => {
+                this.$axios.post('/weeklyreportapi/export', {period: this.weekOfYear}).then((res) => {
                     if (res.data.code === 0) {
                         window.open('http://localhost:1234/'+res.data.data.url);
                     }
@@ -526,7 +526,8 @@
                         message: isExpired ? 'token已过期,重新登录' : error.response.data.error
                     }).then(() => {
                         if (isExpired) {
-                            window.location.href = '/login';
+//                            window.location.href = '/login';
+                            this.$router.push('/login');
                         }
                     });
                 } else {

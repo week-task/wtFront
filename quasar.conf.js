@@ -24,7 +24,7 @@ module.exports = function (ctx) {
     },
     build: {
       scopeHoisting: true,
-      vueRouterMode: 'history',
+      vueRouterMode: 'hash',
       // gzip: true,
       // analyze: true,
       // extractCSS: false,
@@ -35,7 +35,7 @@ module.exports = function (ctx) {
     devServer: {
       // https: true,
       // port: 8080,
-      port: 2223,
+      port: 8111,
       proxy: {
         // proxy all requests starting with /api to jsonplaceholder
         '/api': 'http://localhost:1234'
