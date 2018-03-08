@@ -513,7 +513,8 @@
             exportExcel () {
                 this.$axios.post('/weeklyreportapi/export', {period: this.weekOfYear}).then((res) => {
                     if (res.data.code === 0) {
-                        window.open('https://www.ioteams.com/weeklyreport/#/'+res.data.data.url);
+//                        window.open('https://www.ioteams.com/weeklyreportapi/'+res.data.data.url);
+                        window.open('http://localhost:22230/dist/spa-mat/statics/'+res.data.data.url);
                     }
                 }).catch((err)=>{
                     this.$q.notify({
