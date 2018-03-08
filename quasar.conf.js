@@ -38,7 +38,7 @@ module.exports = function (ctx) {
       port: 8111,
       proxy: {
         // proxy all requests starting with /api to jsonplaceholder
-        '/api': 'http://localhost:1234'
+        '/weeklyreportapi': 'http://localhost:22230'
       },
       open: true // opens browser window automatically
     },

@@ -541,15 +541,29 @@
             handleError (error) {
                 let isExpired = error.response.data.error === 'jwt expired';
                 if (error.response.status !== 500) {
-                    this.$q.dialog({
-                        title: error.response.status + '',
-                        message: isExpired ? 'token已过期,重新登录' : error.response.data.error
-                    }).then(() => {
-                        if (isExpired) {
-//                            window.location.href = '/login';
-                            this.$router.push('/login');
-                        }
+//                    this.$q.dialog({
+//                        title: error.response.status + '',
+//                        message: isExpired ? 'token已过期,重新登录' : error.response.data.error
+//                    }).then(() => {
+//                        if (isExpired) {
+////                            window.location.href = '/login';
+//                            this.$router.push('/login');
+//                        }
+//                    });
+
+                    this.$q.notify({
+                        message: isExpired ? 'token已过期,重新登录' : error.response.data.error,
+                        timeout: 3000,
+                        type: 'negative',
+                        position: 'top',
+                        actions: isExpired ? [{
+                            label: '登录',
+                            handler: () => {
+                                this.$router.push('/login');
+                            }
+                        }] : null
                     });
+
                 } else {
                     this.loading = false;
                     this.loadingProject = false;
@@ -566,8 +580,8 @@
 <style lang="less">
     .report-tree {
         position:absolute;
-        width:600px;
-        height:auto;
+        width:880px;
+        height:800px;
         top:50%;
         left:50%;
         transform:translate(-50%,-50%);
