@@ -348,7 +348,6 @@
             },
             getReportData () {
                 const _this = this;
-//                const user = JSON.parse(localStorage.getItem('user'));
                 let queryParams = {
                     period: _this.weekOfYear,
                     username: _this.user.name,
@@ -360,10 +359,6 @@
                         if (res.data.data.length > 0) {
                             _this.tableData = res.data.data;
                         } else if (res.data.data.length === 0) {
-//                            _this.$q.dialog({
-//                                title: '提示',
-//                                message: '第'+ _this.weekOfYear + '期周报暂无数据'
-//                            });
                             _this.$q.notify({
                                 message: '第'+ _this.weekOfYear + '期周报暂无数据,会自动跳转到最新一期',
                                 timeout: 3000,
@@ -541,16 +536,6 @@
             handleError (error) {
                 let isExpired = error.response.data.error === 'jwt expired';
                 if (error.response.status !== 500) {
-//                    this.$q.dialog({
-//                        title: error.response.status + '',
-//                        message: isExpired ? 'token已过期,重新登录' : error.response.data.error
-//                    }).then(() => {
-//                        if (isExpired) {
-////                            window.location.href = '/login';
-//                            this.$router.push('/login');
-//                        }
-//                    });
-
                     this.$q.notify({
                         message: isExpired ? 'token已过期,重新登录' : error.response.data.error,
                         timeout: 3000,
@@ -587,7 +572,6 @@
         transform:translate(-50%,-50%);
     }
     .report-tree-select {
-        /*width: 160px;*/
         position: absolute;
         right: 15px;
         top: -10px;
