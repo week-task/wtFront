@@ -71,7 +71,9 @@ module.exports = function (ctx) {
 	    'QTable',
 	    'QTh',
 	    'QTr',
-	    'QTd'
+	    'QTd',
+        'QBreadcrumbs',
+        'QBreadcrumbsEl'
       ],
       directives: [
         'Ripple'

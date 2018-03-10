@@ -20,6 +20,20 @@ export default [
       requireAuth: true
     }
   },
+  {
+    path: '/project',
+    component: () => import('components/project'),
+    meta: {
+      requireAuth: true
+    }
+  },
+  {
+    path: '/user',
+    component: () => import('components/user'),
+    meta: {
+      requireAuth: true
+    }
+  },
 
   { // Always leave this as last one
     path: '*',
