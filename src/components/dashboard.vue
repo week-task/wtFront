@@ -481,6 +481,9 @@
 //                this.createProjectModal = true;
                 this.$router.push('/project');
             },
+            redirectUser () {
+                this.$router.push('/user');
+            },
             saveProject () {
                 const _this = this;
                 _this.$v.projectForm.$touch();
@@ -517,7 +520,7 @@
                 this.$axios.post('/weeklyreportapi/export', {period: this.weekOfYear}).then((res) => {
                     if (res.data.code === 0) {
 //                        window.open('https://www.ioteams.com/weeklyreportapi/'+res.data.data.url);
-                        window.open('http://localhost:22230/dist/spa-mat/statics/'+res.data.data.url);
+                        window.open('http://localhost:22230/index.html#/dist/spa-mat/statics/'+res.data.data.url);
                     }
                 }).catch((err)=>{
                     this.$q.notify({

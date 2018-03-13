@@ -2,8 +2,11 @@
     <div class="user">
         <q-breadcrumbs separator="●" color="light" active-color="dark">
             <q-breadcrumbs-el label="HOME" to="/" />
-            <q-breadcrumbs-el label="USER" to="/project" />
+            <q-breadcrumbs-el label="USER" to="/user" />
         </q-breadcrumbs>
+        <p>
+            USER功能完善中。。。
+        </p>
     </div>
 </template>
 
