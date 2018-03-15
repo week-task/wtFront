@@ -34,6 +34,13 @@ export default [
       requireAuth: true
     }
   },
+  {
+    path: '/admin',
+    component: () => import('components/admin/admin'),
+    meta: {
+      requireAuth: true
+    }
+  },
 
   { // Always leave this as last one
     path: '*',

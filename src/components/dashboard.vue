@@ -22,6 +22,7 @@
                     :columns="showUser ? columnsLeader : columns"
                     selection="single"
                     :selected.sync="item.selected"
+                    :pagination.sync="paginationControl"
                     color="primary"
                     no-data-label="暂无数据"
                     table-class="task-table">
@@ -135,6 +136,7 @@
                 loadingProject: false,
                 createTaskModal: false,
                 createProjectModal: false,
+                paginationControl: {rowsPerPage: 0, page: 1},
                 weekOfYear: '',
                 user: {},
                 select: '2018-03-01',

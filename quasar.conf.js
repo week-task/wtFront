@@ -64,14 +64,16 @@ module.exports = function (ctx) {
         'QField',
         'QInput',
         'QDialog',
-	    'QTree',
-	    'QCollapsible',
-	    'QSelect',
-	    'QModal',
-	    'QTable',
-	    'QTh',
-	    'QTr',
-	    'QTd'
+        'QTree',
+        'QCollapsible',
+        'QSelect',
+        'QModal',
+        'QTable',
+        'QTh',
+        'QTr',
+        'QTd',
+        'QBreadcrumbs',
+        'QBreadcrumbsEl'
       ],
       directives: [
         'Ripple'
