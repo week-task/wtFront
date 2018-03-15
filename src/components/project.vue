@@ -54,8 +54,12 @@
         name: 'Project',
         data () {
             return {
+                isSuper: false, //判断是否为超级管理员
+                isAdmin: false, //判断是否是管理员
+                showUser: false,
                 createProjectModal: false,
                 loadingProject: false,
+                user: {},
                 columns: [
                     {name: '项目名称', label: '项目名称', field: 'name', align: 'left'}
                 ],
@@ -69,7 +73,8 @@
                     ]
                 }],
                 projectForm: {
-                    name: ''
+                    name: '',
+                    team: ''
                 }
             }
         },
@@ -84,14 +89,97 @@
 //            document.onkeyup = (e) => {
 //                if (window.event.keyCode === 13) _this.login();
 //            }
+            this.init();
         },
         methods: {
+            init () {
+                const _this = this;
+                _this.user = JSON.parse(localStorage.getItem('user'));
+                _this.isAdmin = _this.user.role === 0;
+                _this.showUser = _this.user.role !== 2;
+                _this.getProjectList();
+            },
+            getProjectList () {
+                const _this = this;
+                _this.projectOptions = [];
+                _this.$axios.get('/weeklyreportapi/getProjectList').then((res) => {
+                    if (res.data.code === 0) {
+                        let data = res.data.data;
+                        console.log(res.data.data);
+                        for (let i = 0, size = data.length; i < size; i++) {
+                            _this.projectOptions.push({
+                                label: data[i].name,
+                                value: data[i]._id
+                            });
+                        }
+                    }
+                }).catch((error) => {
+                    _this.handleError(error);
+                });
+            },
             createProject () {
                 this.createProjectModal = true;
             },
             editProject () {},
             deleteProject () {},
-            saveProject () {},
+            saveProject () {
+                const _this = this;
+                _this.$v.projectForm.$touch();
+                _this.projectForm.team = _this.user.team;                
+                if (_this.$v.projectForm.$error) {
+                    return;
+                }
+                _this.loadingProject = true;
+                _this.$axios.post('/weeklyreportapi/project/add', _this.projectForm).then((res) => {
+                    if (res.data.code === 0) {
+                        // _this.getProjectsList();
+                        _this.$q.notify({
+                            message: res.data.message,
+                            timeout: 3000,
+                            type: 'positive',
+                            position: 'top'
+                        });
+                        setTimeout(()=>{
+                            _this.loadingProject = false;
+                            _this.createProjectModal = false;
+                            _this.projectForm.name = '';
+                        }, 1000);
+                    } else {
+                        _this.loading = false;
+                        _this.$q.dialog({
+                            title: 'Error',
+                            message: res.data.message
+                        });
+                    }
+                }).catch((error)=>{
+                    _this.handleError(error);
+                });
+            },
+            handleError (error) {
+                let isExpired = error.response.data.error === 'jwt expired';
+                if (error.response.status !== 500) {
+                    this.$q.notify({
+                        message: isExpired ? 'token已过期,重新登录' : error.response.data.error,
+                        timeout: 3000,
+                        type: 'negative',
+                        position: 'top',
+                        actions: isExpired ? [{
+                            label: '登录',
+                            handler: () => {
+                                this.$router.push('/login');
+                            }
+                        }] : null
+                    });
+
+                } else {
+                    this.loading = false;
+                    this.loadingProject = false;
+                    this.$q.dialog({
+                        title: error.response.status + '',
+                        message: error.response.data.message
+                    });
+                }
+            }
         }
     }
 </script>
@@ -121,6 +209,10 @@
         -webkit-box-shadow: none;
         -moz-box-shadow: none;
         box-shadow: none;
+    }
+
+    .form-field {
+        margin: 12px 0;
     }
 
     .task-table {
