@@ -12,6 +12,7 @@
                         :columns="columns"
                         selection="single"
                         :selected.sync="item.selected"
+                        :pagination.sync="paginationControl"
                         color="primary"
                         no-data-label="暂无数据"
                         table-class="task-table">
@@ -59,11 +60,12 @@
                 showUser: false,
                 createProjectModal: false,
                 loadingProject: false,
+                paginationControl: {rowsPerPage: 0, page: 1},
                 user: {},
                 columns: [
                     {name: '项目名称', label: '项目名称', field: 'name', align: 'left'}
                 ],
-                tableData: [{
+                tableDataMock: [{
                     team: '大数据团队',
                     selected: [],
                     data: [
@@ -71,6 +73,11 @@
                         {id: 2, name: '大数据项目2'},
                         {id: 3, name: '大数据项目3'}
                     ]
+                }],
+                tableData: [{
+                    project: '暂无数据',
+                    selected: [],
+                    data: []
                 }],
                 projectForm: {
                     name: '',
@@ -105,13 +112,7 @@
                 _this.$axios.get('/weeklyreportapi/getProjectList').then((res) => {
                     if (res.data.code === 0) {
                         let data = res.data.data;
-                        console.log(res.data.data);
-                        for (let i = 0, size = data.length; i < size; i++) {
-                            _this.projectOptions.push({
-                                label: data[i].name,
-                                value: data[i]._id
-                            });
-                        }
+                        _this.tableData = data;
                     }
                 }).catch((error) => {
                     _this.handleError(error);
