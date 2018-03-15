@@ -1,12 +1,19 @@
 <template>
     <div class="report-tree">
+
+        <q-breadcrumbs separator="●" color="light" active-color="dark" class="navigator">
+            <q-breadcrumbs-el label="HOME" to="/" />
+            <!--<q-breadcrumbs-el label="Project" to="/project" />-->
+        </q-breadcrumbs>
+
         <q-select
             v-model="select"
             :options="periodOptions"
             class="report-tree-select"/>
 
         <q-btn icon="file download" label="EXPORT" @click="exportExcel" class="btn-create" v-if="isAdmin" />
-        <q-btn icon="add" label="PROJECT" @click="createProject" class="btn-create" v-if="showUser" />
+        <q-btn icon="code" label="USER" @click="redirectUser" class="btn-create" v-if="isAdmin" />
+        <q-btn icon="code" label="PROJECT" @click="createProject" class="btn-create" v-if="showUser" />
         <q-btn icon="add" label="TASK" @click="createTask" class="btn-create" v-if="!historyTask" />
         <q-collapsible v-for="(item, index) in tableData" popup icon="layers" :label="item.project" :key="index">
             <div>
@@ -365,7 +372,6 @@
                                 type: 'positive',
                                 position: 'top'
                             });
-
                             _this.getWeekOfYear();
                             _this.select = parseInt(_this.weekOfYear);
                         }
@@ -471,7 +477,11 @@
                 })
             },
             createProject () {
-                this.createProjectModal = true;
+//                this.createProjectModal = true;
+                this.$router.push('/project');
+            },
+            redirectUser () {
+                this.$router.push('/user');
             },
             saveProject () {
                 const _this = this;
@@ -509,7 +519,7 @@
                 this.$axios.post('/weeklyreportapi/export', {period: this.weekOfYear}).then((res) => {
                     if (res.data.code === 0) {
 //                        window.open('https://www.ioteams.com/weeklyreportapi/'+res.data.data.url);
-                        window.open('http://localhost:22230/dist/spa-mat/statics/'+res.data.data.url);
+                        window.open('http://localhost:22230/index.html#/dist/spa-mat/statics/'+res.data.data.url);
                     }
                 }).catch((err)=>{
                     this.$q.notify({
@@ -548,7 +558,6 @@
                             }
                         }] : null
                     });
-
                 } else {
                     this.loading = false;
                     this.loadingProject = false;
@@ -571,6 +580,12 @@
         left:50%;
         transform:translate(-50%,-50%);
     }
+    .navigator {
+        position: absolute;
+        left: 6px;
+        top: -60px;
+        margin: 0;
+    }
     .report-tree-select {
         position: absolute;
         right: 15px;
@@ -586,7 +601,6 @@
     .btn-save {
         margin-top: 10px;
     }
-
     .form-field {
         margin: 12px 0;
     }
