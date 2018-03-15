@@ -339,7 +339,7 @@
             getProjectsList () {
                 const _this = this;
                 _this.projectOptions = [];
-                _this.$axios.get('/weeklyreportapi/getProjectList').then((res) => {
+                _this.$axios.post('/weeklyreportapi/getProjectListByTeam', {team: _this.user.team}).then((res) => {
                     if (res.data.code === 0) {
                         let data = res.data.data;
                         for (let i = 0, size = data.length; i < size; i++) {
