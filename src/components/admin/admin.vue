@@ -25,21 +25,29 @@
         </q-collapsible>
 
         <q-modal v-model="createTeamModal" :content-css="{padding: '50px', minWidth: '500px'}">
-            <div class="q-display-1 q-mb-md">创建项目</div>
+            <div class="q-display-1 q-mb-md">创建团队</div>
             <div>
                 <q-field
                         class="form-field"
-                        :error="$v.projectForm.name.$error"
+                        :error="$v.teamForm.name.$error"
                         error-label="Required">
-                    <q-input float-label="项目名称"
-                             @input="$v.projectForm.name.$touch"
-                             v-model="projectForm.name" />
+                    <q-input float-label="团队名称"
+                             @input="$v.teamForm.name.$touch"
+                             v-model="teamForm.name" />
+                </q-field>
+                <q-field
+                        class="form-field"
+                        :error="$v.teamForm.userName.$error"
+                        error-label="Required">
+                    <q-input float-label="团队负责人"
+                             @input="$v.teamForm.userName.$touch"
+                             v-model="teamForm.userName" />
                 </q-field>
                 <q-btn
-                        :loading="loadingProject"
+                        :loading="loadingTeam"
                         color="primary"
                         class="btn-save"
-                        @click="saveProject">
+                        @click="saveTeam">
                     保存
                     <q-spinner-hourglass slot="loading" size="20px" />
                     <span slot="loading">Loading...</span>
@@ -55,11 +63,12 @@
         name: 'Project',
         data () {
             return {
+                loading: false,
                 isSuper: false, //判断是否为超级管理员
                 isAdmin: false, //判断是否是管理员
                 showUser: false,
                 createTeamModal: false,
-                loadingProject: false,
+                loadingTeam: false,
                 paginationControl: {rowsPerPage: 0, page: 1},
                 user: {},
                 columns: [
@@ -79,14 +88,14 @@
                     selected: [],
                     data: []
                 }],
-                projectForm: {
+                teamForm: {
                     name: '',
-                    team: ''
+                    userName: ''
                 }
             }
         },
         validations: {
-            projectForm: {
+            teamForm: {
                 name: {required}
             }
         },
@@ -122,15 +131,15 @@
             },
             editProject () {},
             deleteProject () {},
-            saveProject () {
+            saveTeam () {
                 const _this = this;
-                _this.$v.projectForm.$touch();
-                _this.projectForm.team = _this.user.team;                
-                if (_this.$v.projectForm.$error) {
+                _this.$v.teamForm.$touch();
+                _this.teamForm.team = _this.user.team;                
+                if (_this.$v.teamForm.$error) {
                     return;
                 }
-                _this.loadingProject = true;
-                _this.$axios.post('/weeklyreportapi/project/add', _this.projectForm).then((res) => {
+                _this.loadingTeam = true;
+                _this.$axios.post('/weeklyreportapi/team/add', _this.teamForm).then((res) => {
                     if (res.data.code === 0) {
                         // _this.getProjectsList();
                         _this.$q.notify({
@@ -140,9 +149,10 @@
                             position: 'top'
                         });
                         setTimeout(()=>{
-                            _this.loadingProject = false;
+                            _this.loadingTeam = false;
                             _this.createTeamModal = false;
-                            _this.projectForm.name = '';
+                            _this.teamForm.name = '';
+                            _this.teamForm.userName = '';
                         }, 1000);
                     } else {
                         _this.loading = false;
@@ -170,10 +180,14 @@
                             }
                         }] : null
                     });
-
+                    if (isExpired) {
+                        setTimeout(()=> {
+                            this.$router.push('/login');
+                        }, 1000);
+                    }
                 } else {
                     this.loading = false;
-                    this.loadingProject = false;
+                    this.loadingTeam = false;
                     this.$q.dialog({
                         title: error.response.status + '',
                         message: error.response.data.message

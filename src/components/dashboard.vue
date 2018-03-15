@@ -560,6 +560,12 @@
                             }
                         }] : null
                     });
+
+                    if (isExpired) {
+                        setTimeout(()=> {
+                            this.$router.push('/login');
+                        }, 1000);
+                    }
                 } else {
                     this.loading = false;
                     this.loadingProject = false;
