@@ -4,8 +4,24 @@
             <q-breadcrumbs-el label="HOME" to="/" />
             <q-breadcrumbs-el label="ADMIN" to="/project" />
         </q-breadcrumbs>
+        <q-btn icon="add" label="TEAM LEADER" @click="createTeamLeader" class="btn-create" />
         <q-btn icon="add" label="TEAM" @click="createTeam" class="btn-create" />
-        <q-collapsible v-for="(item, index) in tableData" popup icon="layers" :label="item.team" :key="index">
+
+        <div class="wrapper-teamlist">
+            <q-card v-for="(item, index) in teamList" inline class="q-ma-sm" :key="index">
+                <q-card-title>
+                    {{item.name}}
+                    <span slot="subtitle">负责人：{{item.leader.name}}</span>
+                </q-card-title>
+                <q-card-actions>
+                    <q-btn flat @click="editTeam(item)">编辑</q-btn>
+                    <q-btn flat @click="delTeam(item)">删除</q-btn>
+                </q-card-actions>
+            </q-card>
+        </div>
+        
+
+        <!-- <q-collapsible v-for="(item, index) in tableData" popup icon="layers" :label="item.team" :key="index">
             <div>
                 <q-table
                         :data="item.data"
@@ -22,9 +38,32 @@
                     </template>
                 </q-table>
             </div>
-        </q-collapsible>
+        </q-collapsible> -->
 
-        <q-modal v-model="createTeamModal" :content-css="{padding: '50px', minWidth: '500px'}">
+        <q-modal v-model="createTeamLeaderModal" @hide="resetForm" :content-css="{padding: '50px', minWidth: '500px'}">
+            <div class="q-display-1 q-mb-md">创建团队负责人</div>
+            <div>
+                <q-field
+                        class="form-field"
+                        :error="$v.teamLeaderForm.name.$error"
+                        error-label="Required">
+                    <q-input float-label="团队负责人"
+                             @input="$v.teamLeaderForm.name.$touch"
+                             v-model="teamLeaderForm.name" />
+                </q-field>
+                <q-btn
+                        :loading="loadingTeamLeader"
+                        color="primary"
+                        class="btn-save"
+                        @click="saveTeamLeader">
+                    保存
+                    <q-spinner-hourglass slot="loading" size="20px" />
+                    <span slot="loading">Loading...</span>
+                </q-btn>
+            </div>
+        </q-modal>
+
+        <q-modal v-model="createTeamModal" @hide="resetForm" :content-css="{padding: '50px', minWidth: '500px'}">
             <div class="q-display-1 q-mb-md">创建团队</div>
             <div>
                 <q-field
@@ -38,10 +77,11 @@
                 <q-field
                         class="form-field"
                         :error="$v.teamForm.userName.$error"
-                        error-label="Required">
-                    <q-input float-label="团队负责人"
-                             @input="$v.teamForm.userName.$touch"
-                             v-model="teamForm.userName" />
+                        :error-label="errMessage.requireInfo">
+                    <q-select
+                            v-model="teamForm.userName"
+                            float-label="团队负责人"
+                            :options="teamLeaderOptions"/>
                 </q-field>
                 <q-btn
                         :loading="loadingTeam"
@@ -67,10 +107,16 @@
                 isSuper: false, //判断是否为超级管理员
                 isAdmin: false, //判断是否是管理员
                 showUser: false,
+                createTeamLeaderModal: false,
                 createTeamModal: false,
+                loadingTeamLeader: false,
                 loadingTeam: false,
                 paginationControl: {rowsPerPage: 0, page: 1},
                 user: {},
+                errMessage: {
+                    requireInfo: '必填',
+                    maxInfo: '姓名不可以超过4个字符'
+                },
                 columns: [
                     {name: '项目名称', label: '项目名称', field: 'name', align: 'left'}
                 ],
@@ -88,14 +134,24 @@
                     selected: [],
                     data: []
                 }],
+                teamList: [],
+                teamLeaderOptions: [],
+                teamLeaderForm: {
+                    name: ''
+                },
                 teamForm: {
                     name: '',
-                    userName: ''
+                    userName: '',
+                    self: ''
                 }
             }
         },
         validations: {
             teamForm: {
+                name: {required},
+                userName: {required}
+            },
+            teamLeaderForm: {
                 name: {required}
             }
         },
@@ -120,26 +176,77 @@
                 _this.$axios.get('/weeklyreportapi/getTeamList').then((res) => {
                     if (res.data.code === 0) {
                         let data = res.data.data;
-                        _this.tableData = data;
+                        _this.teamList = data;
                     }
                 }).catch((error) => {
                     _this.handleError(error);
                 });
             },
+            getTeamLeaderOptions () {
+                const _this = this;
+                _this.teamLeaderOptions = [
+                    {label: '周涛', value: 0},
+                    {label: '林锋', value: 1},
+                    {label: '李洪波', value: 2},
+                    {label: '孙雪涛', value: 3}
+                ];
+            },
+            createTeamLeader () {
+                this.createTeamLeaderModal = true;
+            },
             createTeam () {
                 this.createTeamModal = true;
+                // 先去获取角色为0的，还没有关联team的team leader
+                this.getTeamLeaderOptions();
             },
-            editProject () {},
-            deleteProject () {},
+            editTeam () {},
+            deleteTeam () {},
+            saveTeamLeader () {
+                const _this = this;
+                _this.$v.teamLeaderForm.$touch();
+                _this.teamLeaderForm.self = _this.user._id;                
+                if (_this.$v.teamLeaderForm.$error) {
+                    return;
+                }
+                _this.loadingTeam = true;
+                _this.$axios.post('/weeklyreportapi/team/addLeader', _this.teamLeaderForm).then((res) => {
+                    console.log('add leader res: ',res);
+                    if (res.data.code === 0) {
+                        // _this.getProjectsList();
+                        _this.$q.notify({
+                            message: res.data.message,
+                            timeout: 3000,
+                            type: 'positive',
+                            position: 'top'
+                        });
+                        setTimeout(()=>{
+                            _this.loadingTeam = false;
+                            _this.createTeamModal = false;
+                            _this.teamLeaderForm.name = '';
+                            _this.teamLeaderForm.userName = '';
+                        }, 1000);
+                    } else {
+                        _this.loading = false;
+                        _this.$q.dialog({
+                            title: 'Error',
+                            message: res.data.message
+                        });
+                    }
+                }).catch((error)=>{
+                    _this.handleError(error);
+                });
+            },
             saveTeam () {
                 const _this = this;
+
                 _this.$v.teamForm.$touch();
-                _this.teamForm.team = _this.user.team;                
+                _this.teamForm.self = _this.user._id;                
                 if (_this.$v.teamForm.$error) {
                     return;
                 }
                 _this.loadingTeam = true;
                 _this.$axios.post('/weeklyreportapi/team/add', _this.teamForm).then((res) => {
+                    console.log('add res: ',res);
                     if (res.data.code === 0) {
                         // _this.getProjectsList();
                         _this.$q.notify({
@@ -164,6 +271,12 @@
                 }).catch((error)=>{
                     _this.handleError(error);
                 });
+            },
+            resetForm () {
+                const _this = this;
+                _this.teamLeaderForm.name = '';
+                _this.teamForm.name = '';
+                _this.teamForm.userName = '';
             },
             handleError (error) {
                 let isExpired = error.response.data.error === 'jwt expired';
@@ -211,6 +324,9 @@
             left: 15px;
             top: -25px;
         }
+    }
+    .wrapper-teamlist {
+        margin-left: 7px;
     }
     .btn-create {
         /*margin-top: 10px;*/
