@@ -221,9 +221,8 @@
                         });
                         setTimeout(()=>{
                             _this.loadingTeam = false;
-                            _this.createTeamModal = false;
+                            _this.createTeamLeaderModal = false;
                             _this.teamLeaderForm.name = '';
-                            _this.teamLeaderForm.userName = '';
                         }, 1000);
                     } else {
                         _this.loading = false;
