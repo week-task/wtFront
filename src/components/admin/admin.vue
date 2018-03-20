@@ -19,26 +19,6 @@
                 </q-card-actions>
             </q-card>
         </div>
-        
-
-        <!-- <q-collapsible v-for="(item, index) in tableData" popup icon="layers" :label="item.team" :key="index">
-            <div>
-                <q-table
-                        :data="item.data"
-                        :columns="columns"
-                        selection="single"
-                        :selected.sync="item.selected"
-                        :pagination.sync="paginationControl"
-                        color="primary"
-                        no-data-label="暂无数据"
-                        table-class="task-table">
-                    <template slot="top-selection" slot-scope="props">
-                        <q-btn color="positive" flat icon="mode edit" label="编辑" @click="editProject(item.selected)"  />
-                        <q-btn color="negative" flat delete icon="delete" label="删除" @click="deleteProject(item.selected)" />
-                    </template>
-                </q-table>
-            </div>
-        </q-collapsible> -->
 
         <q-modal v-model="createTeamLeaderModal" @hide="resetForm" :content-css="{padding: '50px', minWidth: '500px'}">
             <div class="q-display-1 q-mb-md">创建团队负责人</div>
@@ -120,20 +100,6 @@
                 columns: [
                     {name: '项目名称', label: '项目名称', field: 'name', align: 'left'}
                 ],
-                tableDataMock: [{
-                    team: '大数据团队',
-                    selected: [],
-                    data: [
-                        {id: 1, name: '大数据项目1'},
-                        {id: 2, name: '大数据项目2'},
-                        {id: 3, name: '大数据项目3'}
-                    ]
-                }],
-                tableData: [{
-                    project: '暂无数据',
-                    selected: [],
-                    data: []
-                }],
                 teamList: [],
                 teamLeaderOptions: [],
                 teamLeaderForm: {
@@ -184,12 +150,30 @@
             },
             getTeamLeaderOptions () {
                 const _this = this;
-                _this.teamLeaderOptions = [
-                    {label: '周涛', value: 0},
-                    {label: '林锋', value: 1},
-                    {label: '李洪波', value: 2},
-                    {label: '孙雪涛', value: 3}
-                ];
+                // _this.teamLeaderOptions = [
+                //     {label: '周涛', value: 0},
+                //     {label: '林锋', value: 1},
+                //     {label: '李洪波', value: 2},
+                //     {label: '孙雪涛', value: 3}
+                // ];
+
+                _this.$axios.get('/weeklyreportapi/getTeamLeaderList').then((res) => {
+                    console.log('leaders list res: ',res);
+                    if (res.data.code === 0) {
+                        var data = res.data.data;
+                        _this.teamLeaderOptions = [];
+                        for(let i = 0, size = data.length; i < size; i++) {
+                            let item = data[i];
+                            _this.teamLeaderOptions.push({
+                                label: item.name,
+                                value: item._id
+                            });
+                        }
+                    } 
+                }).catch((error)=>{
+                    _this.handleError(error);
+                });
+
             },
             createTeamLeader () {
                 this.createTeamLeaderModal = true;
