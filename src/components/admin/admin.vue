@@ -205,7 +205,44 @@
                 _this.isEdit = true;
                 _this.createTeamModal = true;
             },
-            deleteTeam () {},
+            deleteTeam (data) {
+                const _this = this;
+                this.$q.dialog({
+                    title: '确认',
+                    message: '确认删除该团队吗?',
+                    ok: '删除',
+                    cancel: '再考虑考虑'
+                }).then(() => {
+                    _this.$axios.post('/weeklyreportapi/team/delete', {
+                        id: data._id
+                    }).then((res) => {
+                        if (res.data.code === 0) {
+                            _this.getTeamList();
+                            _this.$q.notify({
+                                message: '已删除,这下真没了!',
+                                timeout: 3000,
+                                type: 'positive',
+                                position: 'top'
+                            });
+                        } else {
+                            _this.loading = false;
+                            _this.$q.dialog({
+                                title: 'Error',
+                                message: res.data.message
+                            });
+                        }
+                    }).catch((error)=>{
+                        _this.handleError(error);
+                    });
+                }).catch(() => {
+                    _this.$q.notify({
+                        message: '看来你是一个很谨慎的人!',
+                        timeout: 3000,
+                        type: 'info',
+                        position: 'top'
+                    });
+                })
+            },
             saveTeamLeader () {
                 const _this = this;
                 _this.$v.teamLeaderForm.$touch();
