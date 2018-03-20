@@ -8,14 +8,14 @@
         <q-btn icon="add" label="TEAM" @click="createTeam" class="btn-create" />
 
         <div class="wrapper-teamlist">
-            <q-card v-for="(item, index) in teamList" inline class="q-ma-sm" :key="index">
+            <q-card v-for="(item, index) in teamList" inline class="q-ma-sm" :key="index" >
                 <q-card-title>
                     {{item.name}}
                     <span slot="subtitle">负责人：{{item.leader.name}}</span>
                 </q-card-title>
                 <q-card-actions>
-                    <q-btn flat @click="editTeam(item)">编辑</q-btn>
-                    <q-btn flat @click="delTeam(item)">删除</q-btn>
+                    <q-btn flat color="dark" @click="editTeam(item)">编辑</q-btn>
+                    <q-btn flat color="light" @click="delTeam(item)">删除</q-btn>
                 </q-card-actions>
             </q-card>
         </div>
@@ -357,6 +357,6 @@
         padding: 0;
     }
     .q-card {
-        width: 200px;
+        width: 30%;
     }
 </style>
