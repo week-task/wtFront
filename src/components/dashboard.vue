@@ -361,7 +361,8 @@
                     period: _this.weekOfYear,
                     username: _this.user.name,
                     userrole: _this.user.role,
-                    userid: _this.user._id
+                    userid: _this.user._id,
+                    team: _this.user.team
                 };
                 _this.$axios.post('/weeklyreportapi/getTaskListByPeriod', queryParams).then((res) => {
                     if (res.data.code === 0) {
