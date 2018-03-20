@@ -44,7 +44,8 @@
         </q-modal>
 
         <q-modal v-model="createTeamModal" @hide="resetForm" :content-css="{padding: '50px', minWidth: '500px'}">
-            <div class="q-display-1 q-mb-md">创建团队</div>
+            <div v-if="!isEdit" class="q-display-1 q-mb-md">创建团队</div>
+            <div v-if="isEdit" class="q-display-1 q-mb-md">编辑团队</div>
             <div>
                 <q-field
                         class="form-field"
@@ -84,6 +85,7 @@
         data () {
             return {
                 loading: false,
+                isEdit: false,
                 isSuper: false, //判断是否为超级管理员
                 isAdmin: false, //判断是否是管理员
                 showUser: false,
@@ -91,21 +93,18 @@
                 createTeamModal: false,
                 loadingTeamLeader: false,
                 loadingTeam: false,
-                paginationControl: {rowsPerPage: 0, page: 1},
                 user: {},
                 errMessage: {
                     requireInfo: '必填',
                     maxInfo: '姓名不可以超过4个字符'
                 },
-                columns: [
-                    {name: '项目名称', label: '项目名称', field: 'name', align: 'left'}
-                ],
                 teamList: [],
                 teamLeaderOptions: [],
                 teamLeaderForm: {
                     name: ''
                 },
                 teamForm: {
+                    id: '',
                     name: '',
                     userName: '',
                     self: ''
@@ -150,13 +149,6 @@
             },
             getTeamLeaderOptions () {
                 const _this = this;
-                // _this.teamLeaderOptions = [
-                //     {label: '周涛', value: 0},
-                //     {label: '林锋', value: 1},
-                //     {label: '李洪波', value: 2},
-                //     {label: '孙雪涛', value: 3}
-                // ];
-
                 _this.$axios.get('/weeklyreportapi/getTeamLeaderList').then((res) => {
                     console.log('leaders list res: ',res);
                     if (res.data.code === 0) {
@@ -183,7 +175,36 @@
                 // 先去获取角色为0的，还没有关联team的team leader
                 this.getTeamLeaderOptions();
             },
-            editTeam () {},
+            editTeam (data) {
+                console.log('edit ', data);
+                const _this = this;
+                _this.teamForm.id = data._id;
+                _this.teamForm.userName = data.leader._id;
+                _this.teamForm.name = data.name;
+                
+                // 获取编辑的leader list，这里特殊的是，需要把当前的数据加入到此list
+                _this.$axios.get('/weeklyreportapi/getTeamLeaderList').then((res) => {
+                    if (res.data.code === 0) {
+                        var datas = res.data.data;
+                        _this.teamLeaderOptions = [];
+                        _this.teamLeaderOptions.push({
+                            label: data.leader.name,
+                            value: data.leader._id
+                        });
+                        for(let i = 0, size = datas.length; i < size; i++) {
+                            let item = datas[i];
+                            _this.teamLeaderOptions.push({
+                                label: item.name,
+                                value: item._id
+                            });
+                        }
+                    } 
+                }).catch((error)=>{
+                    _this.handleError(error);
+                });
+                _this.isEdit = true;
+                _this.createTeamModal = true;
+            },
             deleteTeam () {},
             saveTeamLeader () {
                 const _this = this;
@@ -192,11 +213,10 @@
                 if (_this.$v.teamLeaderForm.$error) {
                     return;
                 }
-                _this.loadingTeam = true;
+                _this.loadingTeamLeader = true;
                 _this.$axios.post('/weeklyreportapi/team/addLeader', _this.teamLeaderForm).then((res) => {
                     console.log('add leader res: ',res);
                     if (res.data.code === 0) {
-                        // _this.getProjectsList();
                         _this.$q.notify({
                             message: res.data.message,
                             timeout: 3000,
@@ -204,9 +224,9 @@
                             position: 'top'
                         });
                         setTimeout(()=>{
-                            _this.loadingTeam = false;
+                            _this.loadingTeamLeader = false;
                             _this.createTeamLeaderModal = false;
-                            _this.teamLeaderForm.name = '';
+                            _this.resetForm();
                         }, 1000);
                     } else {
                         _this.loading = false;
@@ -228,10 +248,9 @@
                     return;
                 }
                 _this.loadingTeam = true;
-                _this.$axios.post('/weeklyreportapi/team/add', _this.teamForm).then((res) => {
-                    console.log('add res: ',res);
+                _this.$axios.post(_this.isEdit ? '/weeklyreportapi/team/edit' : '/weeklyreportapi/team/add', _this.teamForm).then((res) => {
                     if (res.data.code === 0) {
-                        // _this.getProjectsList();
+                        _this.getTeamList();
                         _this.$q.notify({
                             message: res.data.message,
                             timeout: 3000,
@@ -241,8 +260,7 @@
                         setTimeout(()=>{
                             _this.loadingTeam = false;
                             _this.createTeamModal = false;
-                            _this.teamForm.name = '';
-                            _this.teamForm.userName = '';
+                            _this.resetForm();
                         }, 1000);
                     } else {
                         _this.loading = false;
@@ -337,5 +355,8 @@
         right: 50px;
         min-height: 0;
         padding: 0;
+    }
+    .q-card {
+        width: 200px;
     }
 </style>
