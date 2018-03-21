@@ -25,7 +25,8 @@
         </q-collapsible>
 
         <q-modal v-model="createProjectModal" :content-css="{padding: '50px', minWidth: '500px'}">
-            <div class="q-display-1 q-mb-md">创建项目</div>
+            <div v-if="!isEdit" class="q-display-1 q-mb-md">创建项目</div>
+            <div v-if="isEdit" class="q-display-1 q-mb-md">编辑项目</div>
             <div>
                 <q-field
                         class="form-field"
@@ -55,6 +56,7 @@
         name: 'Project',
         data () {
             return {
+                isEdit: false,
                 isSuper: false, //判断是否为超级管理员
                 isAdmin: false, //判断是否是管理员
                 showUser: false,
@@ -109,7 +111,7 @@
             getProjectList () {
                 const _this = this;
                 _this.projectOptions = [];
-                _this.$axios.get('/weeklyreportapi/getProjectList').then((res) => {
+                _this.$axios.post('/weeklyreportapi/getProjectList', {team: _this.user.team}).then((res) => {
                     if (res.data.code === 0) {
                         let data = res.data.data;
                         _this.tableData = data;
@@ -121,8 +123,17 @@
             createProject () {
                 this.createProjectModal = true;
             },
-            editProject () {},
-            deleteProject () {},
+            editProject (props) {
+                console.log('props => ', props);
+                const _this = this;
+                _this.projectForm.id = props[0].id;
+                _this.projectForm.name = props[0].name
+                _this.isEdit = true;
+                _this.createProjectModal = true;
+            },
+            deleteProject () {
+                
+            },
             saveProject () {
                 const _this = this;
                 _this.$v.projectForm.$touch();
@@ -131,7 +142,7 @@
                     return;
                 }
                 _this.loadingProject = true;
-                _this.$axios.post('/weeklyreportapi/project/add', _this.projectForm).then((res) => {
+                _this.$axios.post(_this.isEdit?'/weeklyreportapi/project/edit':'/weeklyreportapi/project/add', _this.projectForm).then((res) => {
                     if (res.data.code === 0) {
                         _this.getProjectList();
                         _this.$q.notify({
