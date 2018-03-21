@@ -133,7 +133,7 @@
                 _this.loadingProject = true;
                 _this.$axios.post('/weeklyreportapi/project/add', _this.projectForm).then((res) => {
                     if (res.data.code === 0) {
-                        // _this.getProjectsList();
+                        _this.getProjectList();
                         _this.$q.notify({
                             message: res.data.message,
                             timeout: 3000,

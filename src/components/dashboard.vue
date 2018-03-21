@@ -369,6 +369,11 @@
                         if (res.data.data.length > 0) {
                             _this.tableData = res.data.data;
                         } else if (res.data.data.length === 0) {
+                            _this.tableData = [{
+                                project: '暂无数据',
+                                selected: [],
+                                data: []
+                            }];
                             _this.$q.notify({
                                 message: '第'+ _this.weekOfYear + '期周报暂无数据,会自动跳转到最新一期',
                                 timeout: 3000,
