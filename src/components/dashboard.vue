@@ -1,6 +1,6 @@
 <template>
     <div class="report-tree">
-
+        <em class="team-title">{{user.teamName}}周报系统</em>
         <q-breadcrumbs separator="●" color="light" active-color="dark" class="navigator">
             <q-breadcrumbs-el label="HOME" to="/" />
             <!--<q-breadcrumbs-el label="Project" to="/project" />-->
@@ -15,24 +15,27 @@
         <q-btn icon="code" label="USER" @click="redirectUser" class="btn-create" v-if="isAdmin" />
         <q-btn icon="code" label="PROJECT" @click="createProject" class="btn-create" v-if="showUser" />
         <q-btn icon="add" label="TASK" @click="createTask" class="btn-create" v-if="!historyTask" />
-        <q-collapsible v-for="(item, index) in tableData" popup icon="layers" :label="item.project" :key="index">
-            <div>
-                <q-table
-                    :data="item.data"
-                    :columns="showUser ? columnsLeader : columns"
-                    selection="single"
-                    :selected.sync="item.selected"
-                    :pagination.sync="paginationControl"
-                    color="primary"
-                    no-data-label="暂无数据"
-                    table-class="task-table">
-                    <template slot="top-selection" slot-scope="props">
-                        <q-btn color="positive" flat icon="mode edit" label="编辑" @click="editTask(item.selected)"  />
-                        <q-btn color="negative" flat delete icon="delete" label="删除" @click="deleteTask(item.selected)" />
-                    </template>
-                </q-table>
-            </div>
-        </q-collapsible>
+        <q-list separator>
+            <q-collapsible v-for="(item, index) in tableData" icon="layers" :label="item.project" :key="index">
+                <div>
+                    <q-table
+                        :data="item.data"
+                        :columns="showUser ? columnsLeader : columns"
+                        selection="single"
+                        :selected.sync="item.selected"
+                        :pagination.sync="paginationControl"
+                        color="primary"
+                        no-data-label="暂无数据"
+                        table-class="task-table">
+                        <template slot="top-selection" slot-scope="props">
+                            <q-btn color="positive" flat icon="mode edit" label="编辑" @click="editTask(item.selected)"  />
+                            <q-btn color="negative" flat delete icon="delete" label="删除" @click="deleteTask(item.selected)" />
+                        </template>
+                    </q-table>
+                </div>
+            </q-collapsible>
+        </q-list>
+        
 
         <q-modal v-model="createTaskModal" @hide="resetForm" :content-css="{padding: '50px', minWidth: '500px'}">
             <div v-if="!isEdit" class="q-display-1 q-mb-md">创建任务</div>
@@ -344,6 +347,15 @@
                 _this.$axios.post('/weeklyreportapi/getProjectListByTeam', {team: _this.user.team}).then((res) => {
                     if (res.data.code === 0) {
                         let data = res.data.data;
+                        if (data.length === 0) {
+                            // 可以提示没有项目，新建项目
+                            _this.$q.notify({
+                                message: res.data.message,
+                                timeout: 3000,
+                                type: 'positive',
+                                position: 'top'
+                            });
+                        }
                         for (let i = 0, size = data.length; i < size; i++) {
                             _this.projectOptions.push({
                                 label: data[i].name,
@@ -594,22 +606,29 @@
         left:50%;
         transform:translate(-50%,-50%);
     }
+    .team-title {
+        position: absolute;
+        top: -88px;
+        font-style: normal;
+        font-size: 20px;
+        font-weight: bold;
+    }
     .navigator {
         position: absolute;
-        left: 6px;
+        left:-8px;
         top: -60px;
         margin: 0;
     }
     .report-tree-select {
         position: absolute;
-        right: 15px;
+        right: 0;
         top: -10px;
         margin: 0;
     }
     .btn-create {
         position: relative;
         top: -15px;
-        left: 15px;
+        // left: 15px;
         display: inline-block;
     }
     .btn-save {

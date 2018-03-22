@@ -13,7 +13,7 @@
 <script>
     import {required, minLength} from 'vuelidate/lib/validators';
     export default {
-        name: 'Login',
+        name: 'User',
         data () {
             return {
             }
@@ -42,6 +42,6 @@
         transform:translate(-50%,-50%);
     }
     .btn-login {
-        margin-top: 10px;
+        // margin-top: 10px;
     }
 </style>

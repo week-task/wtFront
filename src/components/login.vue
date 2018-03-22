@@ -1,6 +1,6 @@
 <template>
     <div class="login">
-        前端团队周报系统
+        周报系统
         <q-field
                 :error="$v.loginParams.username.$error"
                 error-label="必填">

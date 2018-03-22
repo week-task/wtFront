@@ -287,7 +287,7 @@
         transform:translate(-50%,-50%);
         .bread {
             position: relative;
-            left: 15px;
+            // left: 15px;
             top: -25px;
         }
     }
@@ -295,7 +295,7 @@
         /*margin-top: 10px;*/
         position: relative;
         top: -15px;
-        left: 15px;
+        // left: 15px;
     }
 
     .q-table-container {
