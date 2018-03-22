@@ -86,8 +86,11 @@
                             localStorage.setItem('token', authInfo.token);
                             // Bearer是JWT的头部认证
                             _this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + authInfo.token;
-                            _this.$router.push('/');
-//                            window.location.href = '/dashboard';
+                            if (authInfo.user.role === -1) {
+                                _this.$router.push('/admin');
+                            } else {
+                                _this.$router.push('/');
+                            }
                         }, 1000);
                     } else {
                         console.log(res);

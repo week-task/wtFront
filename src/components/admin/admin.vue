@@ -1,8 +1,9 @@
 <template>
     <div class="project">
+        <em class="team-title">{{user.teamName}} 团队管理</em>
         <q-breadcrumbs class="bread" separator="●" color="light" active-color="dark">
-            <q-breadcrumbs-el label="HOME" to="/" />
-            <q-breadcrumbs-el label="ADMIN" to="/project" />
+            <q-breadcrumbs-el label="HOME" />
+            <q-breadcrumbs-el label="ADMIN" to="/admin" />
         </q-breadcrumbs>
         <q-btn icon="add" label="TEAM LEADER" @click="createTeamLeader" class="btn-create" />
         <q-btn icon="add" label="TEAM" @click="createTeam" class="btn-create" />
@@ -358,13 +359,21 @@
         left:50%;
         transform:translate(-50%,-50%);
         .bread {
-            position: relative;
-            left: -10px;
-            top: -25px;
+            position: absolute;
+            left:-8px;
+            top: -60px;
+            margin: 0;
         }
     }
+    .team-title {
+        position: absolute;
+        top: -88px;
+        font-style: normal;
+        font-size: 20px;
+        font-weight: bold;
+    }
     .wrapper-teamlist {
-        margin-left: 7px;
+        margin-left: -7px;
     }
     .btn-create {
         /*margin-top: 10px;*/

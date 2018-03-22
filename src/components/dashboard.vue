@@ -536,11 +536,12 @@
                 });
             },
             exportExcel () {
-                this.$axios.post('/weeklyreportapi/export', {period: this.weekOfYear}).then((res) => {
+                this.$axios.post('/weeklyreportapi/export', {period: this.weekOfYear, team:this.user.team}).then((res) => {
+                    console.log('export excel ',res);
                     if (res.data.code === 0) {
 //                        window.open('https://www.ioteams.com/weeklyreportapi/'+res.data.data.url);
                         window.open('http://localhost:22230/index.html#/dist/spa-mat/statics/'+res.data.data.url);
-                    }
+                    } 
                 }).catch((err)=>{
                     this.$q.notify({
                         message: err.response.data.message,

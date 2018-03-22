@@ -1,5 +1,6 @@
 <template>
     <div class="project">
+        <em class="team-title">{{user.teamName}}项目管理</em>
         <q-breadcrumbs class="bread" separator="●" color="light" active-color="dark">
             <q-breadcrumbs-el label="HOME" to="/" />
             <q-breadcrumbs-el label="PROJECT" to="/project" />
@@ -286,10 +287,18 @@
         left:50%;
         transform:translate(-50%,-50%);
         .bread {
-            position: relative;
-            // left: 15px;
-            top: -25px;
+            position: absolute;
+            left:-8px;
+            top: -60px;
+            margin: 0;
         }
+    }
+    .team-title {
+        position: absolute;
+        top: -88px;
+        font-style: normal;
+        font-size: 20px;
+        font-weight: bold;
     }
     .btn-create {
         /*margin-top: 10px;*/
