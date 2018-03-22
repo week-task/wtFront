@@ -18,6 +18,7 @@
                         table-class="task-table">
                     <template slot="top-selection" slot-scope="props">
                         <q-btn color="positive" flat icon="mode edit" label="编辑" @click="editProject(item.selected)"  />
+                        <q-btn color="info" flat icon="lock open" label="启用" @click="launchProject(item.selected)" />
                         <q-btn color="negative" flat delete icon="delete" label="禁用或删除" @click="deleteProject(item.selected)" />
                     </template>
                 </q-table>
@@ -132,22 +133,21 @@
                 _this.isEdit = true;
                 _this.createProjectModal = true;
             },
-            deleteProject (props) {
-                // _this.projectForm.id = props[0].id;
+            launchProject (props) {
                 const _this = this;
                 this.$q.dialog({
                     title: '确认',
-                    message: '确认删除该项目吗?',
-                    ok: '删除',
+                    message: '确认启用该项目吗?',
+                    ok: '启用',
                     cancel: '再考虑考虑'
                 }).then(() => {
-                    _this.$axios.post('/weeklyreportapi/project/delete', {
+                    _this.$axios.post('/weeklyreportapi/project/launch', {
                         id: props[0].id
                     }).then((res) => {
                         if (res.data.code === 0) {
                             _this.getProjectList();
                             _this.$q.notify({
-                                message: '已删除,这下真没了!',
+                                message: '已启用',
                                 timeout: 3000,
                                 type: 'positive',
                                 position: 'top'
@@ -170,6 +170,45 @@
                         position: 'top'
                     });
                 })
+            },
+            deleteProject (props) {
+                // _this.projectForm.id = props[0].id;
+                const _this = this;
+                this.$q.dialog({
+                    title: '确认',
+                    message: '确认删除该项目吗?',
+                    ok: '删除',
+                    cancel: '再考虑考虑'
+                }).then(() => {
+                    _this.$axios.post('/weeklyreportapi/project/delete', {
+                        id: props[0].id
+                    }).then((res) => {
+                        if (res.data.code === 0) {
+                            _this.getProjectList();
+                            _this.$q.notify({
+                                message: res.data.message,
+                                timeout: 3000,
+                                type: 'positive',
+                                position: 'top'
+                            });
+                        } else {
+                            _this.loading = false;
+                            _this.$q.dialog({
+                                title: 'Error',
+                                message: res.data.message
+                            });
+                        }
+                    }).catch((error)=>{
+                        _this.handleError(error);
+                    });
+                }).catch(() => {
+                    _this.$q.notify({
+                        message: '看来你是一个很谨慎的人!',
+                        timeout: 3000,
+                        type: 'info',
+                        position: 'top'
+                    });
+                });
             },
             saveProject () {
                 const _this = this;
