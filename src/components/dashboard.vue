@@ -15,6 +15,7 @@
         <q-btn icon="code" label="USER" @click="redirectUser" class="btn-create" v-if="isAdmin" />
         <q-btn icon="code" label="PROJECT" @click="createProject" class="btn-create" v-if="showUser" />
         <q-btn icon="add" label="TASK" @click="createTask" class="btn-create" v-if="!historyTask" />
+        <q-btn icon="mode edit" label="PASS" @click="changePasswordModal" class="btn-create" />
         <q-list separator>
             <q-collapsible v-for="(item, index) in tableData" icon="layers" :label="item.project" :key="index">
                 <div>
@@ -98,22 +99,23 @@
             </q-btn>
         </q-modal>
 
-        <q-modal v-model="createProjectModal" :content-css="{padding: '50px', minWidth: '500px'}">
-            <div class="q-display-1 q-mb-md">创建项目</div>
+        <q-modal v-model="passwordModal" :content-css="{padding: '50px', minWidth: '500px'}">
+            <div class="q-display-1 q-mb-md">修改密码</div>
             <div>
                 <q-field
                         class="form-field"
-                        :error="$v.projectForm.name.$error"
+                        :error="$v.passwordForm.password.$error"
                         error-label="Required">
-                    <q-input float-label="项目名称"
-                             @input="$v.projectForm.name.$touch"
-                             v-model="projectForm.name" />
+                    <q-input float-label="新密码"
+                            type="password"
+                             @input="$v.passwordForm.password.$touch"
+                             v-model="passwordForm.password" />
                 </q-field>
                 <q-btn
-                        :loading="loadingProject"
+                        :loading="loadingPassword"
                         color="primary"
                         class="btn-save"
-                        @click="saveProject">
+                        @click="changePassword">
                     保存
                     <q-spinner-hourglass slot="loading" size="20px" />
                     <span slot="loading">Loading...</span>
@@ -136,9 +138,9 @@
                 showUser: false, // 判断是否是二级管理员
                 historyTask: false,
                 loading: false,
-                loadingProject: false,
+                loadingPassword: false,
                 createTaskModal: false,
-                createProjectModal: false,
+                passwordModal: false,
                 paginationControl: {rowsPerPage: 0, page: 1},
                 weekOfYear: '',
                 user: {},
@@ -183,8 +185,9 @@
                     remark: '',
                     period: ''
                 },
-                projectForm: {
-                    name: ''
+                passwordForm: {
+                    userId: '',
+                    password: ''
                 },
                 errMessage: {
                     requireInfo: '必填',
@@ -289,8 +292,9 @@
                 status: {required},
                 remark: {}
             },
-            projectForm: {
-                name: {required}
+            passwordForm: {
+                userId: {required},
+                password: {required}
             }
         },
         created () {
@@ -503,14 +507,18 @@
             redirectUser () {
                 this.$router.push('/user');
             },
-            saveProject () {
+            changePasswordModal () {
+                this.passwordModal = true;
+            },
+            changePassword () {
                 const _this = this;
-                _this.$v.projectForm.$touch();
-                if (_this.$v.projectForm.$error) {
+                _this.passwordForm.userId = _this.user._id;
+                _this.$v.passwordForm.$touch();
+                if (_this.$v.passwordForm.$error) {
                     return;
                 }
-                _this.loadingProject = true;
-                _this.$axios.post('/weeklyreportapi/project/add', _this.projectForm).then((res) => {
+                _this.loadingPassword = true;
+                _this.$axios.post('/weeklyreportapi/user/editpassword', _this.passwordForm).then((res) => {
                     if (res.data.code === 0) {
                         _this.getProjectsList();
                         _this.$q.notify({
@@ -520,9 +528,9 @@
                             position: 'top'
                         });
                         setTimeout(()=>{
-                            _this.loadingProject = false;
-                            _this.createProjectModal = false;
-                            _this.projectForm.name = '';
+                            _this.loadingPassword = false;
+                            _this.passwordModal = false;
+                            _this.passwordForm.password = '';
                         }, 1000);
                     } else {
                         _this.loading = false;
