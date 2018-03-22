@@ -16,9 +16,9 @@
                         color="primary"
                         no-data-label="暂无数据"
                         table-class="task-table">
-                    <template slot="top-selection" slot-scope="props">
+                    <template slot="top-selection" slot-scope="props" :props="props">
                         <q-btn color="positive" flat icon="mode edit" label="编辑" @click="editProject(item.selected)"  />
-                        <q-btn color="info" flat icon="lock open" label="启用" @click="launchProject(item.selected)" />
+                        <q-btn v-if="item.selected[0].status === 1" color="info" flat icon="lock open" label="启用" @click="launchProject(item.selected)" />
                         <q-btn color="negative" flat delete icon="delete" label="禁用或删除" @click="deleteProject(item.selected)" />
                     </template>
                 </q-table>
@@ -116,7 +116,7 @@
                 _this.$axios.post('/weeklyreportapi/getProjectList', {team: _this.user.team}).then((res) => {
                     if (res.data.code === 0) {
                         let data = res.data.data;
-                        _this.tableData = data;
+                        if (data.length > 0) {_this.tableData = data;}
                     }
                 }).catch((error) => {
                     _this.handleError(error);
