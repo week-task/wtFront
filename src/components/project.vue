@@ -6,25 +6,28 @@
             <q-breadcrumbs-el label="PROJECT" to="/project" />
         </q-breadcrumbs>
         <q-btn icon="add" label="PROJECT" @click="createProject" class="btn-create" />
-        <q-collapsible v-for="(item, index) in tableData" popup icon="layers" :label="item.team" :key="index">
-            <div>
-                <q-table
-                        :data="item.data"
-                        :columns="columns"
-                        selection="single"
-                        :selected.sync="item.selected"
-                        :pagination.sync="paginationControl"
-                        color="primary"
-                        no-data-label="暂无数据"
-                        table-class="task-table">
-                    <template slot="top-selection" slot-scope="props" :props="props">
-                        <q-btn color="positive" flat icon="mode edit" label="编辑" @click="editProject(item.selected)"  />
-                        <q-btn v-if="item.selected[0].status === 1" color="info" flat icon="lock open" label="启用" @click="launchProject(item.selected)" />
-                        <q-btn color="negative" flat delete icon="delete" label="禁用或删除" @click="deleteProject(item.selected)" />
-                    </template>
-                </q-table>
-            </div>
-        </q-collapsible>
+        <q-list>
+            <q-collapsible v-for="(item, index) in tableData" open icon="layers" :label="item.team" :key="index">
+                <div>
+                    <q-table
+                            :data="item.data"
+                            :columns="columns"
+                            selection="single"
+                            :selected.sync="item.selected"
+                            :pagination.sync="paginationControl"
+                            color="primary"
+                            no-data-label="暂无数据"
+                            table-class="task-table">
+                        <template slot="top-selection" slot-scope="props" :props="props">
+                            <q-btn color="positive" flat icon="mode edit" label="编辑" @click="editProject(item.selected)"  />
+                            <q-btn v-if="item.selected[0].status === 1" color="info" flat icon="lock open" label="启用" @click="launchProject(item.selected)" />
+                            <q-btn color="negative" flat delete icon="delete" label="禁用或删除" @click="deleteProject(item.selected)" />
+                        </template>
+                    </q-table>
+                </div>
+            </q-collapsible>
+        </q-list>
+        
 
         <q-modal v-model="createProjectModal" :content-css="{padding: '50px', minWidth: '500px'}">
             <div v-if="!isEdit" class="q-display-1 q-mb-md">创建项目</div>

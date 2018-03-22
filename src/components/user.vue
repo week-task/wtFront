@@ -1,5 +1,6 @@
 <template>
     <div class="user">
+        <em class="team-title">{{user.teamName}} 用户管理</em>
         <q-breadcrumbs separator="●" color="light" active-color="dark">
             <q-breadcrumbs-el label="HOME" to="/" />
             <q-breadcrumbs-el label="USER" to="/user" />
@@ -16,6 +17,7 @@
         name: 'User',
         data () {
             return {
+                user: {}
             }
         },
         validations: {
@@ -26,8 +28,14 @@
 //            document.onkeyup = (e) => {
 //                if (window.event.keyCode === 13) _this.login();
 //            }
+            this.init();
         },
         methods: {
+            init () {
+                const _this = this;
+                _this.user = JSON.parse(localStorage.getItem('user'));
+            }
+            
         }
     }
 </script>
@@ -40,8 +48,18 @@
         top:50%;
         left:50%;
         transform:translate(-50%,-50%);
+        .bread {
+            position: absolute;
+            left:-8px;
+            top: -60px;
+            margin: 0;
+        }
     }
-    .btn-login {
-        // margin-top: 10px;
+    .team-title {
+        position: absolute;
+        top: -88px;
+        font-style: normal;
+        font-size: 20px;
+        font-weight: bold;
     }
 </style>
