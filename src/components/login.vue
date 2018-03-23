@@ -1,6 +1,6 @@
 <template>
     <div class="login">
-        周报系统
+        <em>周报系统</em>
         <q-field
                 :error="$v.loginParams.username.$error"
                 error-label="必填">
@@ -122,6 +122,11 @@
         top:50%;
         left:50%;
         transform:translate(-50%,-50%);
+        em {
+            font-size: 20px;
+            font-style: normal;
+            font-weight: bold;
+        }
     }
     .btn-login {
         margin-top: 10px;
