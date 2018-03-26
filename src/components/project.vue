@@ -281,7 +281,7 @@
     }
 </script>
 
-<style lang="less">
+<style scoped lang="less">
     .project {
         position:absolute;
         width:60%;

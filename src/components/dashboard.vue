@@ -629,7 +629,7 @@
     }
 </script>
 
-<style lang="less">
+<style scoped lang="less">
     .report-tree {
         position:absolute;
         width:60%;

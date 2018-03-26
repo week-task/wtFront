@@ -1,7 +1,7 @@
 <template>
     <div class="user">
         <em class="team-title">{{user.teamName}} 用户管理</em>
-        <q-breadcrumbs separator="●" color="light" active-color="dark">
+        <q-breadcrumbs class="bread" separator="●" color="light" active-color="dark">
             <q-breadcrumbs-el label="HOME" to="/" />
             <q-breadcrumbs-el label="USER" to="/user" />
         </q-breadcrumbs>
@@ -40,7 +40,7 @@
     }
 </script>
 
-<style lang="less">
+<style scoped lang="less">
     .user {
         position:absolute;
         width:60%;

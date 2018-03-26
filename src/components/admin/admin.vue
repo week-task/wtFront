@@ -1,6 +1,6 @@
 <template>
-    <div class="project">
-        <em class="team-title">{{user.teamName}} 团队管理</em>
+    <div class="admin">
+        <em class="team-title">{{user.name}} 团队管理</em>
         <q-breadcrumbs class="bread" separator="●" color="light" active-color="dark">
             <q-breadcrumbs-el label="HOME" />
             <q-breadcrumbs-el label="ADMIN" to="/admin" />
@@ -350,8 +350,8 @@
     }
 </script>
 
-<style lang="less">
-    .project {
+<style scoped lang="less">
+    .admin {
         position:absolute;
         width:60%;
         height:50%;
