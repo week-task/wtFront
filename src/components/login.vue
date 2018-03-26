@@ -101,10 +101,9 @@
                         });
                     }
                 }).catch((error)=>{
-                    console.log(error);
                     _this.loading = false;
                     _this.$q.dialog({
-                        title: error.response.status,
+                        title: error.response.status + '',
                         message: error.response.data.message
                     });
                 });
