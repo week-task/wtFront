@@ -323,6 +323,8 @@
     .task-table {
         border: none;
     }
+</style>
+<style lang="less">
     .q-table-top {
         position: absolute;
         top: -45px;
