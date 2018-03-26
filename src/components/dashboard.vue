@@ -104,12 +104,30 @@
             <div>
                 <q-field
                         class="form-field"
+                        :error="$v.passwordForm.oldPassword.$error"
+                        :error-label="errMessage.requireInfo">
+                    <q-input float-label="旧密码"
+                            type="password"
+                             @input="$v.passwordForm.oldPassword.$touch"
+                             v-model="passwordForm.oldPassword" />
+                </q-field>
+                <q-field
+                        class="form-field"
                         :error="$v.passwordForm.password.$error"
-                        error-label="Required">
+                        :error-label="$v.passwordForm.password.minLength ? errMessage.requireInfo : errMessage.minInfo">
                     <q-input float-label="新密码"
                             type="password"
                              @input="$v.passwordForm.password.$touch"
                              v-model="passwordForm.password" />
+                </q-field>
+                <q-field
+                        class="form-field"
+                        :error="$v.passwordForm.confirmPassword.$error"
+                        :error-label="$v.passwordForm.confirmPassword.sameAsPassword ? errMessage.requireInfo : errMessage.sameAsInfo">
+                    <q-input float-label="确认密码"
+                            type="password"
+                             @input="$v.passwordForm.confirmPassword.$touch"
+                             v-model="passwordForm.confirmPassword" />
                 </q-field>
                 <q-btn
                         :loading="loadingPassword"
@@ -126,7 +144,7 @@
 </template>
 
 <script>
-    import {required, minLength, maxLength} from 'vuelidate/lib/validators';
+    import {required, minLength, maxLength, sameAs} from 'vuelidate/lib/validators';
     import {date} from 'quasar';
     export default {
         name: 'REPORT',
@@ -191,7 +209,9 @@
                 },
                 errMessage: {
                     requireInfo: '必填',
-                    maxInfo: '任务名称不宜超过30个字符'
+                    maxInfo: '任务名称不宜超过30个字符',
+                    minInfo: '密码最少6位',
+                    sameAsInfo: '输入的两次密码不一致'
                 },
                 columns: [
                     {name: '任务名称', label: '任务名称', field: 'name', align: 'left'},
@@ -294,7 +314,9 @@
             },
             passwordForm: {
                 userId: {required},
-                password: {required}
+                oldPassword: {required},
+                password: {required, minLength: minLength(6)},
+                confirmPassword: {required, sameAsPassword: sameAs('password')}
             }
         },
         created () {
@@ -533,7 +555,7 @@
                             _this.passwordForm.password = '';
                         }, 1000);
                     } else {
-                        _this.loading = false;
+                        _this.loadingPassword = false;
                         _this.$q.dialog({
                             title: 'Error',
                             message: res.data.message
@@ -596,6 +618,7 @@
                 } else {
                     this.loading = false;
                     this.loadingProject = false;
+                    this.loadingPassword = false;
                     this.$q.dialog({
                         title: error.response.status + '',
                         message: error.response.data.message
