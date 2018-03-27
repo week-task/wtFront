@@ -72,7 +72,7 @@
                     :loading="loadingUser"
                     color="primary"
                     class="btn-save"
-                    @click="saveTask">
+                    @click="saveUser">
                 保存
                 <q-spinner-hourglass slot="loading" size="20px" />
                 <span slot="loading">Loading...</span>
@@ -160,6 +160,9 @@
             init () {
                 const _this = this;
                 _this.user = JSON.parse(localStorage.getItem('user'));
+            },
+            getParentList () {
+                // 获取role=1的小组长角色
             },
             createUser () {
                 this.createUserModal = true;
