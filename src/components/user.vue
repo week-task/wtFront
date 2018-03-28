@@ -19,9 +19,9 @@
                             no-data-label="暂无数据"
                             table-class="task-table">
                         <template slot="top-selection" slot-scope="props" :props="props">
-                            <q-btn color="positive" flat icon="mode edit" label="编辑" @click="editProject(item.selected)"  />
+                            <q-btn color="positive" flat icon="mode edit" label="编辑" @click="editUser(item.selected)"  />
                             <!-- <q-btn v-if="item.selected[0].status === 1" color="info" flat icon="lock open" label="启用" @click="launchProject(item.selected)" /> -->
-                            <q-btn color="negative" flat delete icon="delete" label="离职或删除" @click="deleteProject(item.selected)" />
+                            <q-btn color="negative" flat delete icon="delete" label="离职或删除" @click="deleteUser(item.selected)" />
                         </template>
                     </q-table>
                 </div>
@@ -146,7 +146,7 @@
         validations: {
             userForm: {
                 name: {required, maxLength: maxLength(5)},
-                parent: {required},
+                parent: {},
                 role: {required},
                 status: {required},
             }
@@ -207,6 +207,19 @@
                 this.createUserModal = true;
                 this.getParentList();
             },
+            editUser (props) {
+                const _this = this;
+                _this.isEdit = true;
+                _this.createUserModal = true;
+                _this.getParentList();
+                // console.log('props ', props);
+                _this.userForm.id = props[0].id;
+                _this.userForm.name = props[0].name;
+                _this.userForm.role = props[0].role;
+                _this.userForm.status = props[0].status;
+                _this.userForm.parent = props[0].parent;
+                _this.userForm.team = props[0].team;
+            },
             saveUser () {
                 const _this = this;
                 _this.$v.userForm.$touch();
@@ -227,6 +240,7 @@
                         setTimeout(()=>{
                             _this.loadingUser = false;
                             _this.createUserModal = false;
+                            _this.isEdit = false;
                         }, 1000);
                     } else {
                         _this.loadingUser = false;
