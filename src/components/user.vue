@@ -7,7 +7,7 @@
         </q-breadcrumbs>
         <q-btn icon="add" label="USER" @click="createUser" class="btn-create" />
         <q-list separator>
-            <q-collapsible v-for="(item, index) in tableData" open icon="layers" :label="item.team" :key="index">
+            <q-collapsible v-for="(item, index) in tableData" open icon="forum" :label="item.user" :key="index">
                 <div>
                     <q-table
                             :data="item.data"
@@ -42,15 +42,6 @@
                 </q-field>
                 <q-field
                         class="form-field"
-                        :error="$v.userForm.parent.$error"
-                        :error-label="errMessage.requireInfo">
-                    <q-select
-                            v-model="userForm.parent"
-                            float-label="小组长"
-                            :options="parentOptions"/>
-                </q-field>
-                <q-field
-                        class="form-field"
                         :error="$v.userForm.status.$error"
                         :error-label="errMessage.requireInfo">
                     <q-select
@@ -66,6 +57,16 @@
                             v-model="userForm.role"
                             float-label="角色"
                             :options="roleOptions"/>
+                </q-field>
+                <q-field
+                        class="form-field"
+                        :error="$v.userForm.parent.$error"
+                        :error-label="errMessage.requireInfo">
+                    <q-select
+                            v-if="userForm.role === 2"
+                            v-model="userForm.parent"
+                            float-label="小组长"
+                            :options="parentOptions"/>
                 </q-field>
             </div>
             <q-btn
@@ -88,6 +89,7 @@
         name: 'User',
         data () {
             return {
+                isEdit: false,
                 loadingUser: false,
                 createUserModal: false,
                 paginationControl: {rowsPerPage: 0, page: 1},
@@ -104,11 +106,7 @@
                     parent: '',
                     team: ''
                 },
-                parentOptions: [
-                    {label: '骆林佳', value: '1111'},
-                    {label: '李茂', value: '2222'},
-                    {label: '林国池', value: '3333'}
-                ],
+                parentOptions: [],
                 statusOptions: [
                     {label: '在职', value: 0},
                     {label: '离职', value: 1}
@@ -117,8 +115,8 @@
                     {label: '小组长', value: 1},
                     {label: '组员', value: 2}
                 ],
-                tableData: [{
-                    team: '李茂',
+                tableDataMock: [{
+                    user: '李茂',
                     selected: [],
                     data: [
                         {id: 1, name: '霍金芳', statusZh: '在职'},
@@ -126,13 +124,18 @@
                         {id: 3, name: '陈波', statusZh: '在职'}
                     ]
                 }, {
-                    team: '骆林佳',
+                    user: '骆林佳',
                     selected: [],
                     data: [
                         {id: 1, name: '巧巧', statusZh: '在职'},
                         {id: 2, name: '高宇', statusZh: '在职'},
                         {id: 3, name: '周杨', statusZh: '在职'}
                     ]
+                }],
+                tableData: [{
+                    project: '暂无数据',
+                    selected: [],
+                    data: []
                 }],
                 errMessage: {
                     requireInfo: '必填',
@@ -160,12 +163,49 @@
             init () {
                 const _this = this;
                 _this.user = JSON.parse(localStorage.getItem('user'));
+                _this.getUserList();
             },
             getParentList () {
+                const _this = this;
                 // 获取role=1的小组长角色
+                _this.$axios.post('/weeklyreportapi/getUserList', {type: 'options', team: _this.user.team}).then((res) => {
+                    if (res.data.code === 0) {
+                        _this.parentOptions = [];
+                        for (let i = 0, size = res.data.data.length; i < size; i++) {
+                            let item = res.data.data[i];
+                            _this.parentOptions.push({
+                                label: item.name,
+                                value: item._id
+                            })
+                        }
+                    } 
+                }).catch((error)=>{
+                    _this.handleError(error);
+                });
+            },
+            getUserList () {
+                const _this = this;
+                // 获取所有属于该team下的users
+                _this.$axios.post('/weeklyreportapi/getUserList', {type: 'all', team: _this.user.team}).then((res) => {
+                    if (res.data.code === 0) {
+                        if (res.data.data.length > 0) {
+                            _this.tableData = res.data.data;
+                            console.log(res.data.data);
+                        } else if (res.data.data.length === 0) {
+                            _this.tableData = [{
+                                user: '暂无数据',
+                                selected: [],
+                                data: []
+                            }];
+                        }
+                    } 
+                }).catch((error)=>{
+                    _this.handleError(error);
+                });
             },
             createUser () {
                 this.createUserModal = true;
+                this.getParentList();
             },
             saveUser () {
                 const _this = this;
@@ -177,7 +217,7 @@
                 _this.loadingUser = true;
                 _this.$axios.post(_this.isEdit?'/weeklyreportapi/user/edit':'/weeklyreportapi/user/add', _this.userForm).then((res) => {
                     if (res.data.code === 0) {
-                        _this.getProjectList();
+                        _this.getUserList();
                         _this.$q.notify({
                             message: res.data.message,
                             timeout: 3000,
@@ -186,8 +226,7 @@
                         });
                         setTimeout(()=>{
                             _this.loadingUser = false;
-                            _this.createProjectModal = false;
-                            _this.userForm.name = '';
+                            _this.createUserModal = false;
                         }, 1000);
                     } else {
                         _this.loadingUser = false;
@@ -199,6 +238,15 @@
                 }).catch((error)=>{
                     _this.handleError(error);
                 });
+            },
+            resetForm () {
+                const _this = this;
+                _this.userForm.id = '';
+                _this.userForm.name = '';
+                _this.userForm.role = 2;
+                _this.userForm.status = 0;
+                _this.userForm.parent = '';
+                _this.userForm.team = '';
             },
             handleError (error) {
                 let isExpired = error.response.data.error === 'jwt expired';
