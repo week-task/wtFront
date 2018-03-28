@@ -253,6 +253,39 @@
                     _this.handleError(error);
                 });
             },
+            deleteUser (props) {
+                const _this = this;
+                _this.$q.dialog({
+                    title: '确认',
+                    message: '确认删除该用户吗?',
+                    ok: '删除',
+                    cancel: '再考虑考虑'
+                }).then(() => {
+                    _this.$axios.post('/weeklyreportapi/user/delete', {
+                        id: props[0].id
+                    }).then((res) => {
+                        if (res.data.code === 0) {
+                            _this.getUserList();
+                            _this.$q.notify({
+                                message: '已删除,这下真没了!',
+                                timeout: 3000,
+                                type: 'positive',
+                                position: 'top'
+                            });
+                        }
+                    }).catch((error)=>{
+                        _this.handleError(error);
+                        _this.getUserList();
+                    });
+                }).catch(() => {
+                    _this.$q.notify({
+                        message: '看来你是一个很谨慎的人!',
+                        timeout: 3000,
+                        type: 'info',
+                        position: 'top'
+                    });
+                })
+            },
             resetForm () {
                 const _this = this;
                 _this.userForm.id = '';
