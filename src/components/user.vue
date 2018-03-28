@@ -20,7 +20,7 @@
                             table-class="task-table">
                         <template slot="top-selection" slot-scope="props" :props="props">
                             <q-btn color="positive" flat icon="mode edit" label="编辑" @click="editUser(item.selected)"  />
-                            <!-- <q-btn v-if="item.selected[0].status === 1" color="info" flat icon="lock open" label="启用" @click="launchProject(item.selected)" /> -->
+                            <q-btn color="info" flat icon="lock open" label="重置密码" @click="resetPass(item.selected)" />
                             <q-btn color="negative" flat delete icon="delete" label="离职或删除" @click="deleteUser(item.selected)" />
                         </template>
                     </q-table>
@@ -285,6 +285,37 @@
                         position: 'top'
                     });
                 })
+            },
+            resetPass (props) {
+                const _this = this;
+                _this.$q.dialog({
+                    title: '确认',
+                    message: '确认重置该用户密码吗?',
+                    ok: '重置',
+                    cancel: '再考虑考虑'
+                }).then(() => {
+                    _this.$axios.post('/weeklyreportapi/user/resetpass', {
+                        id: props[0].id
+                    }).then((res) => {
+                        if (res.data.code === 0) {
+                            _this.$q.notify({
+                                message: res.data.message,
+                                timeout: 3000,
+                                type: 'positive',
+                                position: 'top'
+                            });
+                        }
+                    }).catch((error)=>{
+                        _this.handleError(error);
+                    });
+                }).catch(() => {
+                    _this.$q.notify({
+                        message: '看来你是一个很谨慎的人!',
+                        timeout: 3000,
+                        type: 'info',
+                        position: 'top'
+                    });
+                });
             },
             resetForm () {
                 const _this = this;
