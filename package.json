@@ -2,7 +2,7 @@
   "name": "wtfront",
   "version": "1.0.0",
   "description": "week task front-end",
-  "productName": "week task",
+  "productName": "周报系统",
   "cordovaId": "org.cordova.quasar.app",
   "author": "luolinjia <360512239@qq.com>",
   "private": true,
