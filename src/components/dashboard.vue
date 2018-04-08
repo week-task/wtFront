@@ -428,7 +428,7 @@
             },
             getWeekOfYear () {
                 let tempWeekOfYear = date.formatDate(Date.now(), 'w');
-                this.weekOfYear = date.formatDate(Date.now(), 'd') === 0 ? tempWeekOfYear + 1 : tempWeekOfYear;
+                this.weekOfYear = date.formatDate(Date.now(), 'd') === '0' ? parseInt(tempWeekOfYear) + 1 : tempWeekOfYear;
             },
             createTask () {
                 this.createTaskModal = true;
