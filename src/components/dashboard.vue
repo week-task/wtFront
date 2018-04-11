@@ -340,6 +340,24 @@
                 _this.renderPeriods();
 //                _this.getReportData();
                 _this.getProjectsList();
+                if (_this.user.role === 0) {
+                    _this.checkUnfinishedUsers({team: _this.user.team, period: _this.weekOfYear});
+                }
+            },
+            checkUnfinishedUsers (params) {
+                const _this = this;
+                _this.$axios.post('/weeklyreportapi/task/unfinished', params).then((res) => {
+                    if (res.data.code === 0) {
+                        _this.$q.notify({
+                            message: res.data.message,
+                            timeout: 30000,
+                            type: 'positive',
+                            position: 'top'
+                        });
+                    }
+                }).catch((error) => {
+                    _this.handleError(error);
+                });
             },
             checkFinished () {
                 const _this = this;
