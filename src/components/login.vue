@@ -115,12 +115,16 @@
 
 <style lang="less">
     .login {
-        position:absolute;
-        width:200px;
-        height:300px;
-        top:50%;
-        left:50%;
-        transform:translate(-50%,-50%);
+        // position:absolute;
+        // width:60%;
+        // height:50%;
+        // top:50%;
+        // left:50%;
+        // transform:translate(-50%,-50%);
+        margin: 0 auto;
+        width: 30%;
+        position: relative;
+        margin-top: 300px;
         em {
             font-size: 20px;
             font-style: normal;
@@ -129,6 +133,7 @@
     }
     .btn-login {
         margin-top: 10px;
+        width: 120px;
     }
 
 </style>
