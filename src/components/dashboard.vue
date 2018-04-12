@@ -338,6 +338,9 @@
             select: function () {
                 this.weekOfYear = this.select;
                 this.getReportData();
+                // if (this.user.role === 0) {
+                //     this.checkUnfinishedUsers({team: this.user.team, period: this.weekOfYear});
+                // }
             }
         },
         methods: {
