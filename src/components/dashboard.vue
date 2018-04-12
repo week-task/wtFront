@@ -20,12 +20,22 @@
         <q-alert
           v-if="visibleAlert"
           color="negative"
-          icon="cloud"
+          icon="clear"
           appear
           :actions="[{ label: '知道了', handler: () => { visibleAlert = false } }]"
           class="q-mb-sm"
         >
           {{unfinishedUsers}}
+        </q-alert>
+        <q-alert
+          v-if="doneAlert"
+          color="positive"
+          icon="done all"
+          appear
+          :actions="[{ label: '知道了', handler: () => { doneAlert = false } }]"
+          class="q-mb-sm"
+        >
+          所有人员均已填写周报
         </q-alert>
         <q-list separator>
             <q-collapsible v-for="(item, index) in tableData" icon="layers" :label="item.project" :key="index">
@@ -165,6 +175,7 @@
                 isAdmin: false, // 判断是否是超级管理员
                 showUser: false, // 判断是否是二级管理员
                 visibleAlert: true,
+                doneAlert: false,
                 historyTask: false,
                 loading: false,
                 loadingPassword: false,
@@ -370,7 +381,13 @@
                         //     type: 'positive',
                         //     position: 'top'
                         // });
-                        _this.unfinishedUsers = res.data.message;
+                        if (res.data.data.length > 0) {
+                            _this.unfinishedUsers = res.data.message;
+                        } else {
+                            _this.doneAlert = true;
+                            _this.visibleAlert = false;
+                        }
+                        
                     }
                 }).catch((error) => {
                     _this.handleError(error);
