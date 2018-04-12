@@ -338,6 +338,7 @@
             select: function () {
                 this.weekOfYear = this.select;
                 this.getReportData();
+                // TODO 查询每期的未完成人员列表
                 // if (this.user.role === 0) {
                 //     this.checkUnfinishedUsers({team: this.user.team, period: this.weekOfYear});
                 // }
