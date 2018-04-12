@@ -16,6 +16,17 @@
         <q-btn icon="code" label="PROJECT" @click="createProject" class="btn-create" v-if="showUser" />
         <q-btn icon="add" label="TASK" @click="createTask" class="btn-create" v-if="!historyTask" />
         <q-btn icon="mode edit" label="PASS" @click="changePasswordModal" class="btn-create" />
+
+        <q-alert
+          v-if="visibleAlert"
+          color="negative"
+          icon="cloud"
+          appear
+          :actions="[{ label: '知道了', handler: () => { visibleAlert = false } }]"
+          class="q-mb-sm"
+        >
+          {{unfinishedUsers}}
+        </q-alert>
         <q-list separator>
             <q-collapsible v-for="(item, index) in tableData" icon="layers" :label="item.project" :key="index">
                 <div>
@@ -37,7 +48,6 @@
             </q-collapsible>
         </q-list>
         
-
         <q-modal v-model="createTaskModal" @hide="resetForm" :content-css="{padding: '50px', minWidth: '500px'}">
             <div v-if="!isEdit" class="q-display-1 q-mb-md">创建任务</div>
             <div v-if="isEdit" class="q-display-1 q-mb-md">编辑任务</div>
@@ -154,6 +164,7 @@
                 isEdit: false, // task是否处于编辑状态
                 isAdmin: false, // 判断是否是超级管理员
                 showUser: false, // 判断是否是二级管理员
+                visibleAlert: true,
                 historyTask: false,
                 loading: false,
                 loadingPassword: false,
@@ -162,6 +173,7 @@
                 paginationControl: {rowsPerPage: 0, page: 1},
                 weekOfYear: '',
                 user: {},
+                unfinishedUsers: '',
                 select: '2018-03-01',
                 selectOptions: [
                     {label: '2018-03-01', value: '2018-03-01'},
@@ -348,12 +360,13 @@
                 const _this = this;
                 _this.$axios.post('/weeklyreportapi/task/unfinished', params).then((res) => {
                     if (res.data.code === 0) {
-                        _this.$q.notify({
-                            message: res.data.message,
-                            timeout: 30000,
-                            type: 'positive',
-                            position: 'top'
-                        });
+                        // _this.$q.notify({
+                        //     message: res.data.message,
+                        //     timeout: 30000,
+                        //     type: 'positive',
+                        //     position: 'top'
+                        // });
+                        _this.unfinishedUsers = res.data.message;
                     }
                 }).catch((error) => {
                     _this.handleError(error);

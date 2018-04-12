@@ -177,7 +177,7 @@
                 this.getTeamLeaderOptions();
             },
             editTeam (data) {
-                console.log('edit ', data);
+                // console.log('edit ', data);
                 const _this = this;
                 _this.teamForm.id = data._id;
                 _this.teamForm.userName = data.leader._id;
@@ -340,6 +340,7 @@
                 } else {
                     this.loading = false;
                     this.loadingTeam = false;
+                    this.loadingTeamLeader = false;
                     this.$q.dialog({
                         title: error.response.status + '',
                         message: error.response.data.message

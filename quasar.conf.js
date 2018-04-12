@@ -76,7 +76,8 @@ module.exports = function (ctx) {
         'QBreadcrumbsEl',
         'QCard',
         'QCardTitle',
-        'QCardActions'
+        'QCardActions',
+        'QAlert'
       ],
       directives: [
         'Ripple'
