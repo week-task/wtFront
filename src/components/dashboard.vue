@@ -174,7 +174,7 @@
                 isEdit: false, // task是否处于编辑状态
                 isAdmin: false, // 判断是否是超级管理员
                 showUser: false, // 判断是否是二级管理员
-                visibleAlert: true,
+                visibleAlert: false,
                 doneAlert: false,
                 historyTask: false,
                 loading: false,
@@ -368,6 +368,7 @@
 //                _this.getReportData();
                 _this.getProjectsList();
                 if (_this.user.role === 0) {
+                    _this.visibleAlert = true;
                     _this.checkUnfinishedUsers({team: _this.user.team, period: _this.weekOfYear});
                 }
             },
