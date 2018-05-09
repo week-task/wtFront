@@ -42,7 +42,7 @@
                 <div>
                     <q-table
                         :data="item.data"
-                        :columns="showUser ? columnsLeader : columns"
+                        :columns="columnsLeader"
                         selection="single"
                         :selected.sync="item.selected"
                         :pagination.sync="paginationControl"
@@ -80,6 +80,16 @@
                             float-label="所属项目"
                             :options="projectOptions"/>
                 </q-field>
+                <!-- <q-field
+                        v-if="isEdit"
+                        class="form-field"
+                        :error="$v.taskForm.user_id.$error"
+                        :error-label="errMessage.requireInfo">
+                    <q-select
+                            v-model="taskForm.user_id"
+                            float-label="责任人"
+                            :options="usersOptions"/>
+                </q-field> -->
                 <q-field
                         class="form-field"
                         :error="$v.taskForm.status.$error"
@@ -198,6 +208,7 @@
                     {id: 3, name: 'Mini Programs'}
                 ],
                 projectOptions: [],
+                // usersOptions: [],
                 statusOptions: [
                     {label: '开发中', value: 0},
                     {label: '已提测', value: 1},
@@ -331,6 +342,7 @@
             taskForm: {
                 name: {required, maxLength: maxLength(30)},
                 project_id: {required},
+                // user_id:{required},
                 progress: {required},
                 status: {required},
                 remark: {}
@@ -367,10 +379,13 @@
                 _this.renderPeriods();
 //                _this.getReportData();
                 _this.getProjectsList();
-                if (_this.user.role === 0) {
-                    _this.visibleAlert = true;
-                    _this.checkUnfinishedUsers({team: _this.user.team, period: _this.weekOfYear});
-                }
+                // edit on 2018-05-09：所有人员均对周报状态可见
+                // if (_this.user.role === 0) {
+                //     _this.visibleAlert = true;
+                //     _this.checkUnfinishedUsers({team: _this.user.team, period: _this.weekOfYear});
+                // }
+                _this.visibleAlert = true;
+                _this.checkUnfinishedUsers({team: _this.user.team, period: _this.weekOfYear});
             },
             checkUnfinishedUsers (params) {
                 const _this = this;
@@ -483,6 +498,25 @@
                 let tempWeekOfYear = date.formatDate(Date.now(), 'w');
                 this.weekOfYear = date.formatDate(Date.now(), 'd') === '0' ? parseInt(tempWeekOfYear) + 1 : tempWeekOfYear;
             },
+            getUserList () {
+                const _this = this;
+                // 获取所有属于该team下的users
+                _this.$axios.post('/weeklyreportapi/getUserList', {type: 'teamUsers', team: _this.user.team}).then((res) => {
+                    if (res.data.code === 0) {
+                        _this.usersOptions = [];
+                        for (let i = 0, size = res.data.data.length; i < size; i++) {
+                            let item = res.data.data[i];
+                            _this.usersOptions.push({
+                                label: item.name,
+                                value: item._id
+                            })
+                        }
+                        console.log(_this.usersOptions);
+                    } 
+                }).catch((error)=>{
+                    _this.handleError(error);
+                });
+            },
             createTask () {
                 this.createTaskModal = true;
             },
@@ -525,6 +559,7 @@
             },
             editTask (props) {
                 const _this = this;
+                // _this.getUserList();
                 _this.taskForm.id = props[0].id;
                 _this.taskForm.name = props[0].name;
                 _this.taskForm.period = props[0].period;
