@@ -17,6 +17,8 @@
         <q-btn icon="add" label="TASK" @click="createTask" class="btn-create" v-if="!historyTask" />
         <q-btn icon="mode edit" label="PASS" @click="changePasswordModal" class="btn-create" />
 
+        <q-search v-model="search" class="btn-search-widget" @input="directSearch(search, 1000)" />
+
         <q-alert
           v-if="visibleAlert"
           color="negative"
@@ -180,6 +182,7 @@
         name: 'REPORT',
         data () {
             return {
+                search: '',
                 isDeploy: false,
                 isEdit: false, // task是否处于编辑状态
                 isAdmin: false, // 判断是否是超级管理员
@@ -614,6 +617,39 @@
 //                this.createProjectModal = true;
                 this.$router.push('/project');
             },
+            directSearch (text, delay) {
+                const _this = this;
+                var timer;
+                timer && clearTimeout(timer);
+                timer = setTimeout(function(){
+                    let queryParams = {
+                        period: _this.weekOfYear,
+                        keyword: _this.search,
+                        team: _this.user.team
+                    };
+                    // console.log('keyword: => ', _this.search);
+                    _this.$axios.post('/weeklyreportapi/getTaskListByKeyword', queryParams).then((res) => {
+                        if (res.data.code === 0) {
+                            console.log('res: => ', res.data.data);
+                            if (res.data.data.res.length > 0) {
+                                _this.tableData = res.data.data.res;
+                                _this.doneAlert = true;
+                                _this.unfinishedUsers = '搜索到 ' + res.data.data.size + ' 条记录';
+                            } else if (res.data.data.res.length === 0) {
+                                _this.tableData = [{
+                                    project: '暂无数据',
+                                    selected: [],
+                                    data: []
+                                }];
+                                _this.doneAlert = false;
+                                _this.unfinishedUsers = '数据库没记录！';
+                            }
+                        }
+                    }).catch((error) => {
+                        _this.handleError(error);
+                    });
+                }, delay);
+            },
             redirectUser () {
                 this.$router.push('/user');
             },
@@ -768,6 +804,9 @@
     }
     .task-table {
         border: none;
+    }
+    .btn-search-widget {
+        margin-bottom: .3rem
     }
 </style>
 <style lang="less">
