@@ -16,6 +16,8 @@
         <q-btn icon="code" label="PROJECT" @click="createProject" class="btn-create" v-if="showUser" />
         <q-btn icon="add" label="TASK" @click="createTask" class="btn-create" v-if="!historyTask" />
         <q-btn icon="mode edit" label="PASS" @click="changePasswordModal" class="btn-create" />
+        <q-icon class="btn-create hide-size" name="visibility" v-if="isHide" @click.native="getReportHideData" title="隐藏未更新任务" />
+        <q-icon class="btn-create hide-size active" name="visibility_off" v-if="!isHide" @click.native="getReportData" title="显示全部" />
 
         <q-search v-model="search" class="btn-search-widget" @input="directSearch(search, 1000)" />
 
@@ -37,7 +39,7 @@
           :actions="[{ label: '知道了', handler: () => { doneAlert = false } }]"
           class="q-mb-sm"
         >
-          所有人员均已填写周报
+          {{ finishedTip }}
         </q-alert>
         <q-list separator>
             <q-collapsible v-for="(item, index) in tableData" icon="layers" :label="item.project" :key="index">
@@ -183,6 +185,7 @@
         data () {
             return {
                 search: '',
+                isHide: true,
                 isDeploy: false,
                 isEdit: false, // task是否处于编辑状态
                 isAdmin: false, // 判断是否是超级管理员
@@ -198,6 +201,7 @@
                 weekOfYear: '',
                 user: {},
                 unfinishedUsers: '',
+                finishedTip: '所有人员均已填写周报',
                 select: '2018-03-01',
                 selectOptions: [
                     {label: '2018-03-01', value: '2018-03-01'},
@@ -464,6 +468,30 @@
                     _this.handleError(error);
                 });
             },
+            getReportHideData () {
+                const _this = this;
+                let queryParams = {
+                    period: _this.weekOfYear,
+                    username: _this.user.name,
+                    userrole: _this.user.role,
+                    userid: _this.user._id,
+                    team: _this.user.team
+                };
+                _this.$axios.post('/weeklyreportapi/getTaskListByChanged', queryParams).then((res) => {
+                    if (res.data.code === 0) {
+                        if (res.data.data.length > 0) {
+                            _this.tableData = res.data.data;
+                        } else if (res.data.data.length === 0) {
+                            _this.tableData = [{
+                                project: '暂无数据',
+                                selected: [],
+                                data: []
+                            }];
+                        }
+                    }
+                    _this.isHide = false;
+                });
+            },
             getReportData () {
                 const _this = this;
                 let queryParams = {
@@ -493,6 +521,7 @@
                             _this.select = parseInt(_this.weekOfYear);
                         }
                     }
+                    _this.isHide = true;
                 }).catch((error) => {
                     _this.handleError(error);
                 });
@@ -634,7 +663,8 @@
                             if (res.data.data.res.length > 0) {
                                 _this.tableData = res.data.data.res;
                                 _this.doneAlert = true;
-                                _this.unfinishedUsers = '搜索到 ' + res.data.data.size + ' 条记录';
+                                _this.visibleAlert = false;
+                                _this.finishedTip = '搜索到 ' + res.data.data.size + ' 条记录';
                             } else if (res.data.data.res.length === 0) {
                                 _this.tableData = [{
                                     project: '暂无数据',
@@ -642,7 +672,8 @@
                                     data: []
                                 }];
                                 _this.doneAlert = false;
-                                _this.unfinishedUsers = '数据库没记录！';
+                                _this.visibleAlert = true;
+                                _this.finishedTip = '数据库没记录！';
                             }
                         }
                     }).catch((error) => {
@@ -807,6 +838,14 @@
     }
     .btn-search-widget {
         margin-bottom: .3rem
+    }
+    .hide-size {
+        font-size: 2rem;
+        margin-left: 1rem;
+        cursor: pointer;
+        &:hover, &.active {
+            color: #027be3;
+        }
     }
 </style>
 <style lang="less">
