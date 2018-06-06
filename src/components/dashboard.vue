@@ -364,6 +364,9 @@
         created () {
             this.initFormData();
         },
+        updated () {
+            
+        },
         watch: {
             select: function () {
                 this.weekOfYear = this.select;
@@ -372,6 +375,9 @@
                 // if (this.user.role === 0) {
                 //     this.checkUnfinishedUsers({team: this.user.team, period: this.weekOfYear});
                 // }
+            },
+            search: function () {
+                this.directSearch(this.search, 1000);
             }
         },
         methods: {
@@ -468,6 +474,15 @@
                     _this.handleError(error);
                 });
             },
+            clickTrigger () {
+                const _this = this;
+                _this.$nextTick(function(){
+                    // var xx = document.querySelectorAll("tr>td:nth-of-type(5)");
+                    Array.from(document.querySelectorAll('tr>td:nth-of-type(5)')).map(item => {item.addEventListener('click', function(){
+                        _this.search = this.innerHTML;
+                    }, false)})
+                });
+            },
             getReportHideData () {
                 const _this = this;
                 let queryParams = {
@@ -505,6 +520,7 @@
                     if (res.data.code === 0) {
                         if (res.data.data.length > 0) {
                             _this.tableData = res.data.data;
+                            _this.clickTrigger();
                         } else if (res.data.data.length === 0) {
                             _this.tableData = [{
                                 project: '暂无数据',
@@ -656,15 +672,20 @@
                         keyword: _this.search,
                         team: _this.user.team
                     };
-                    // console.log('keyword: => ', _this.search);
+                    if (queryParams.keyword === '') {
+                        _this.getReportData();
+                        _this.doneAlert = false;
+                        _this.visibleAlert = false;
+                        return;
+                    }
                     _this.$axios.post('/weeklyreportapi/getTaskListByKeyword', queryParams).then((res) => {
                         if (res.data.code === 0) {
-                            console.log('res: => ', res.data.data);
                             if (res.data.data.res.length > 0) {
                                 _this.tableData = res.data.data.res;
                                 _this.doneAlert = true;
                                 _this.visibleAlert = false;
                                 _this.finishedTip = '搜索到 ' + res.data.data.size + ' 条记录';
+                                _this.clickTrigger();
                             } else if (res.data.data.res.length === 0) {
                                 _this.tableData = [{
                                     project: '暂无数据',
@@ -673,7 +694,7 @@
                                 }];
                                 _this.doneAlert = false;
                                 _this.visibleAlert = true;
-                                _this.finishedTip = '数据库没记录！';
+                                _this.unfinishedUsers = '数据库没记录！';
                             }
                         }
                     }).catch((error) => {
