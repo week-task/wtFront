@@ -17,7 +17,7 @@
         <q-btn icon="add" label="TASK" @click="createTask" class="btn-create" v-if="!historyTask" />
         <q-btn icon="mode edit" label="PASS" @click="changePasswordModal" class="btn-create" />
         <q-icon class="btn-create hide-size" name="visibility" v-if="isHide" @click.native="getReportHideData" title="隐藏未更新任务" />
-        <q-icon class="btn-create hide-size active" name="visibility_off" v-if="!isHide" @click.native="getReportData" title="显示全部" />
+        <q-icon class="btn-create hide-size active" name="visibility_off" v-if="!isHide" @click.native="getReportNormalData" title="显示全部" />
 
         <q-search v-model="search" class="btn-search-widget" @input="directSearch(search, 1000)" />
 
@@ -490,7 +490,8 @@
                     username: _this.user.name,
                     userrole: _this.user.role,
                     userid: _this.user._id,
-                    team: _this.user.team
+                    team: _this.user.team,
+                    keyword: _this.search
                 };
                 _this.$axios.post('/weeklyreportapi/getTaskListByChanged', queryParams).then((res) => {
                     if (res.data.code === 0) {
@@ -506,6 +507,10 @@
                     }
                     _this.isHide = false;
                 });
+            },
+            getReportNormalData () {
+                const _this = this;
+                _this.search === '' ? _this.getReportData() : _this.directSearch();
             },
             getReportData () {
                 const _this = this;
@@ -581,7 +586,7 @@
                 _this.loading = true;
                 _this.$axios.post(_this.isEdit ? '/weeklyreportapi/task/edit' : '/weeklyreportapi/task/add', _this.taskForm).then((res) => {
                     if (res.data.code === 0) {
-                        _this.getReportData();
+                        _this.search === '' ? _this.getReportData() : _this.directSearch('', 1000);
                         _this.$q.notify({
                             message: res.data.message,
                             timeout: 3000,
