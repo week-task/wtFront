@@ -6,10 +6,20 @@
             <!--<q-breadcrumbs-el label="Project" to="/project" />-->
         </q-breadcrumbs>
 
-        <q-select
-            v-model="select"
-            :options="periodOptions"
-            class="report-tree-select"/>
+
+        <div class="report-tree-select">
+            <q-select
+                v-model="selectYear"
+                :options="yearPeriodOptions"
+                class="select-right"/>
+
+            <q-select
+                v-model="select"
+                :options="periodOptions"
+                class="select-right"/>
+        </div>
+
+        
 
         <q-btn icon="file download" label="EXPORT" @click="exportExcel" class="btn-create" v-if="isAdmin" />
         <q-btn icon="code" label="USER" @click="redirectUser" class="btn-create" v-if="isAdmin" />
@@ -199,6 +209,7 @@
                 passwordModal: false,
                 paginationControl: {rowsPerPage: 0, page: 1},
                 weekOfYear: '',
+                selectYear: '2019',
                 user: {},
                 unfinishedUsers: '',
                 finishedTip: '所有人员均已填写周报',
@@ -209,6 +220,10 @@
                     {label: '2018-02-13', value: '2018-02-13'}
                 ],
                 periodOptions: [],
+                yearPeriodOptions: [
+                    {label: '2018年', value: '2018'},
+                    {label: '2019年', value: '2019'}
+                ],
                 projectsMock: [
                     {id: 1, name: 'Portal'},
                     {id: 2, name: 'Admin'},
@@ -376,6 +391,9 @@
                 //     this.checkUnfinishedUsers({team: this.user.team, period: this.weekOfYear});
                 // }
             },
+            selectYear: function() {
+                this.renderPeriods();
+            },
             search: function () {
                 this.directSearch(this.search, 1000);
             }
@@ -398,7 +416,8 @@
                 //     _this.checkUnfinishedUsers({team: _this.user.team, period: _this.weekOfYear});
                 // }
                 _this.visibleAlert = true;
-                _this.checkUnfinishedUsers({team: _this.user.team, period: _this.weekOfYear});
+                // edited on 2019-01-03:新增字段年份
+                _this.checkUnfinishedUsers({team: _this.user.team, period: _this.weekOfYear, year: _this.selectYear});
             },
             checkUnfinishedUsers (params) {
                 const _this = this;
@@ -440,7 +459,12 @@
             },
             renderPeriods () {
                 const _this = this;
-                for (let i = parseInt(_this.weekOfYear); i > 9; i--) {
+                _this.periodOptions = [];
+                _this.getWeekOfYear();
+                // console.log(date.formatDate(new Date(2018, 11, 30)))
+                console.log(date.formatDate(new Date(2018, 11, 30), 'w'))
+                // console.log('xx =.  ', (_this.selectYear === '2018' ? date.formatDate(new Date(2018, 11, 31), 'w') : parseInt(_this.weekOfYear)));
+                for (let i = (_this.selectYear === '2018' ? 53 : parseInt(_this.weekOfYear)); i > (_this.selectYear === '2018' ? 9 : 0); i--) {
                     _this.periodOptions.push({
                         label: (_this.isAdmin ? '' : _this.user.name + ' ') + '第'+ i + '期周报',
                         value: i
@@ -486,6 +510,7 @@
             getReportHideData () {
                 const _this = this;
                 let queryParams = {
+                    year: _this.selectYear, // added by karl on 2019-01-03
                     period: _this.weekOfYear,
                     username: _this.user.name,
                     userrole: _this.user.role,
@@ -515,6 +540,7 @@
             getReportData () {
                 const _this = this;
                 let queryParams = {
+                    year: _this.selectYear,
                     period: _this.weekOfYear,
                     username: _this.user.name,
                     userrole: _this.user.role,
@@ -533,7 +559,7 @@
                                 data: []
                             }];
                             _this.$q.notify({
-                                message: '第'+ _this.weekOfYear + '期周报暂无数据,会自动跳转到最新一期',
+                                message: _this.selectYear + '年 第'+ _this.weekOfYear + '期周报暂无数据,会自动跳转到最新一期',
                                 timeout: 3000,
                                 type: 'positive',
                                 position: 'top'
@@ -550,6 +576,7 @@
             getWeekOfYear () {
                 let tempWeekOfYear = date.formatDate(Date.now(), 'w');
                 this.weekOfYear = date.formatDate(Date.now(), 'd') === '0' ? parseInt(tempWeekOfYear) + 1 : tempWeekOfYear;
+                // console.log('weekOfyaer', this.weekOfYear);
             },
             getUserList () {
                 const _this = this;
@@ -673,6 +700,7 @@
                 timer && clearTimeout(timer);
                 timer = setTimeout(function(){
                     let queryParams = {
+                        year: _this.selectYear,
                         period: _this.weekOfYear,
                         keyword: _this.search,
                         team: _this.user.team
@@ -841,6 +869,10 @@
         right: 0;
         top: -10px;
         margin: 0;
+        .select-right {
+            margin-left: 10px;
+            float: left;
+        }
     }
     .btn-create {
         position: relative;
