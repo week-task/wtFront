@@ -1,11 +1,20 @@
 <template>
     <div class="report-tree">
+        <q-alert
+            v-if="visibleTopInfoAlert"
+            color="positive"
+            icon="access_alarm"
+            appear
+            :actions="[{ label: '知道了', handler: () => { visibleTopInfoAlert = false } }]"
+            class="q-mb-sm top-info"
+        >
+          更新了新的模块：「团队能量图」，也就是下方的「ENERGY」，通过该模块，大家可以清晰地了解团队成员目前的工作能量情况！目前仅支持团队小组长进行更新。有意见欢迎指正！
+        </q-alert>
         <em class="team-title">{{user.teamName}}周报系统</em>
         <q-breadcrumbs separator="●" color="light" active-color="dark" class="navigator">
             <q-breadcrumbs-el label="HOME" to="/" />
             <!--<q-breadcrumbs-el label="Project" to="/project" />-->
         </q-breadcrumbs>
-
 
         <div class="report-tree-select">
             <q-select
@@ -19,13 +28,12 @@
                 class="select-right"/>
         </div>
 
-        
-
         <q-btn icon="file download" label="EXPORT" @click="exportExcel" class="btn-create" v-if="isAdmin" />
         <q-btn icon="code" label="USER" @click="redirectUser" class="btn-create" v-if="isAdmin" />
         <q-btn icon="code" label="PROJECT" @click="createProject" class="btn-create" v-if="showUser" />
         <q-btn icon="add" label="TASK" @click="createTask" class="btn-create" v-if="!historyTask" />
         <q-btn icon="mode edit" label="PASS" @click="changePasswordModal" class="btn-create" />
+        <q-btn icon="whatshot" label="ENERGY" @click="redirectEnergy" class="btn-create" />
         <q-icon class="btn-create hide-size" name="visibility" v-if="isHide" @click.native="getReportHideData" title="隐藏未更新任务" />
         <q-icon class="btn-create hide-size active" name="visibility_off" v-if="!isHide" @click.native="getReportNormalData" title="显示全部" />
 
@@ -72,7 +80,7 @@
             </q-collapsible>
         </q-list>
         
-        <q-modal v-model="createTaskModal" @hide="resetForm" :content-css="{padding: '50px', minWidth: '500px'}">
+        <q-modal no-esc-dismiss v-model="createTaskModal" @hide="resetForm" :content-css="{padding: '50px', minWidth: '500px'}">
             <div v-if="!isEdit" class="q-display-1 q-mb-md">创建任务</div>
             <div v-if="isEdit" class="q-display-1 q-mb-md">编辑任务</div>
             <div>
@@ -128,6 +136,7 @@
                         :error="$v.taskForm.remark.$error"
                         :error-label="errMessage.requireInfo">
                     <q-input float-label="备注"
+                            type="textarea"
                              @input="$v.taskForm.remark.$touch"
                              v-model="taskForm.remark" />
                 </q-field>
@@ -143,7 +152,7 @@
             </q-btn>
         </q-modal>
 
-        <q-modal v-model="passwordModal" :content-css="{padding: '50px', minWidth: '500px'}">
+        <q-modal no-esc-dismiss v-model="passwordModal" :content-css="{padding: '50px', minWidth: '500px'}">
             <div class="q-display-1 q-mb-md">修改密码</div>
             <div>
                 <q-field
@@ -201,6 +210,7 @@
                 isAdmin: false, // 判断是否是超级管理员
                 showUser: false, // 判断是否是二级管理员
                 visibleAlert: false,
+                visibleTopInfoAlert: true,
                 doneAlert: false,
                 historyTask: false,
                 loading: false,
@@ -461,10 +471,10 @@
                 const _this = this;
                 _this.periodOptions = [];
                 _this.getWeekOfYear();
-                // console.log(date.formatDate(new Date(2018, 11, 30)))
-                console.log(date.formatDate(new Date(2018, 11, 30), 'w'))
-                // console.log('xx =.  ', (_this.selectYear === '2018' ? date.formatDate(new Date(2018, 11, 31), 'w') : parseInt(_this.weekOfYear)));
-                for (let i = (_this.selectYear === '2018' ? 53 : parseInt(_this.weekOfYear)); i > (_this.selectYear === '2018' ? 9 : 0); i--) {
+                
+                // console.log(date.formatDate(new Date(2018, 11, 30), 'w'))
+                // update the time on 2019-01-03
+                for (let i = (_this.selectYear === '2018' ? 52 : parseInt(_this.weekOfYear)); i > (_this.selectYear === '2018' ? 9 : 0); i--) {
                     _this.periodOptions.push({
                         label: (_this.isAdmin ? '' : _this.user.name + ' ') + '第'+ i + '期周报',
                         value: i
@@ -738,6 +748,9 @@
             redirectUser () {
                 this.$router.push('/user');
             },
+            redirectEnergy () {
+                this.$router.push('/userEnergy');
+            },
             changePasswordModal () {
                 this.passwordModal = true;
             },
@@ -904,6 +917,10 @@
         &:hover, &.active {
             color: #027be3;
         }
+    }
+    .top-info {
+        position: absolute;
+        top: -180px;
     }
 </style>
 <style lang="less">

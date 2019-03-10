@@ -21,6 +21,13 @@ export default [
     }
   },
   {
+    path: '/project_type',
+    component: () => import('components/chooseType'),
+    meta: {
+      requireAuth: true
+    }
+  },
+  {
     path: '/project',
     component: () => import('components/project'),
     meta: {
@@ -30,6 +37,13 @@ export default [
   {
     path: '/user',
     component: () => import('components/user'),
+    meta: {
+      requireAuth: true
+    }
+  },
+  {
+    path: '/userEnergy',
+    component: () => import('components/userEnergy'),
     meta: {
       requireAuth: true
     }
