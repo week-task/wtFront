@@ -5,21 +5,60 @@
             <q-breadcrumbs-el label="HOME" to="/" />
             <q-breadcrumbs-el label="USER ENERGY" to="/userEnergy" />
         </q-breadcrumbs>
-        <!-- <q-btn icon="add" label="USER" @click="createUser" class="btn-create" /> -->
+        <q-btn icon="group" label="ALL" @click="checkSelfGroup(false)" class="btn-group" title="所有成员" />
+        <q-btn icon="person" label="GROUP" @click="checkSelfGroup(true)" class="btn-group" title="只关注本组成员" />
+
+        <ul class="example-energy">
+            <li>
+                <q-progress
+                    class="" 
+                    :percentage="100"
+                    color="negative"
+                    stripe
+                    animate
+                    height="45px"
+                />
+                Busy
+            </li>
+            <li>
+                <q-progress
+                    class="" 
+                    :percentage="100"
+                    color="warning"
+                    stripe
+                    animate
+                    height="45px"
+                />
+                Normal
+            </li>
+            <li>
+                <q-progress
+                    class="" 
+                    :percentage="100"
+                    color="positive"
+                    stripe
+                    animate
+                    height="45px"
+                />
+                Free
+            </li>
+        </ul>
+
         <q-list separator>
             <ul class="user-energy-list">
                 <li v-for="item in userList" v-bind:key="item._id">
                     <span>{{item.name}}</span>
-                    <div class="progress-status" :style="{width: user.role !== 1 ? '80%': ''}">
+                    <div class="progress-status" :style="{width: user.role === 2 ? '80%': ''}">
                         <q-progress
                             class="" 
                             :percentage="100 - item.energy"
+                            :color="item.color"
                             stripe
                             animate
                             height="45px"
                         />
                         <q-tooltip anchor="top left" self="bottom left" :offset="[10, 10]" class="show-energy-desc" style="min-width: 300px;margin-left:20px;">
-                            <strong>描述</strong>
+                            <strong>描述：剩余能量<span style="color:yellow;">{{item.energy}}</span></strong>
                             <p v-if="item.energy_desc !== ''" v-for="(itemP, index) in item.energy_desc.split('\n')" v-bind:key="index" class="show-energy-desc-p" style="min-width: 300px;margin-top: 10px;">
                                 {{itemP}}
                             </p>
@@ -29,7 +68,7 @@
                         </q-tooltip>
                     </div>
                     
-                    <q-icon class="update-energy" name="mode edit" v-if="item.parent === user._id" @click.native="updateEnergy(item)" title="更新能量值" />
+                    <q-icon class="update-energy" name="adjust" v-if="item.parent === user._id || user.role === 0" @click.native="updateEnergy(item)" title="更新能量值" />
                     
                 </li>
             </ul>
@@ -42,7 +81,7 @@
                         class="form-field"
                         :error="$v.userEnergyForm.energy.$error"
                         :error-label="$v.userEnergyForm.energy.between ? errMessage.requireInfo : errMessage.betweenInfo">
-                    <q-input float-label="用户能量值"
+                    <q-input float-label="用户已使用能量值"
                              @input="$v.userEnergyForm.energy.$touch"
                              v-model="userEnergyForm.energy" />
                 </q-field>
@@ -79,6 +118,11 @@
                 editUserEnergyModal: false,
                 loadingUserEnergy: false,
                 progressModel: 30,
+                queue: '',
+                isShowGroup: false,
+                colorCard:{
+
+                },
                 userEnergyForm: {
                     id: '',
                     name: '',
@@ -116,17 +160,18 @@
             getUserList () {
                 const _this = this;
                 // 获取所有属于该team下的users
-                _this.$axios.post('/weeklyreportapi/getUserList', {type: 'usersEnergy', team: _this.user.team}).then((res) => {
+                _this.$axios.post('/weeklyreportapi/getUserList', {
+                    type: 'usersEnergy', 
+                    team: _this.user.team,
+                    queue: _this.queue,
+                    parentId: _this.isShowGroup ? _this.user.parent_id : ''
+                }).then((res) => {
                     if (res.data.code === 0) {
                         if (res.data.data.length > 0) {
                             _this.userList = res.data.data;
-                            console.log('userEnergy users => ', res.data.data);
+                            // console.log('userEnergy users => ', res.data.data);
                         } else if (res.data.data.length === 0) {
-                            _this.userList = [{
-                                user: '暂无数据',
-                                selected: [],
-                                data: []
-                            }];
+                            _this.userList = [];
                         }
                     } 
                 }).catch((error)=>{
@@ -135,10 +180,14 @@
             },
             updateEnergy (item) {
                 this.userEnergyForm.id = item._id;
-                this.userEnergyForm.energy = item.energy;
+                this.userEnergyForm.energy = 100 - item.energy;
                 this.userEnergyForm.name = item.name;
                 this.userEnergyForm.energyDesc = item.energy_desc;
                 this.editUserEnergyModal = true;
+            },
+            checkSelfGroup (isShowSelfGroup) {
+                this.isShowGroup = isShowSelfGroup;
+                this.getUserList();
             },
             saveUserEnergy () {
                 const _this = this;
@@ -150,7 +199,7 @@
                 _this.loadingUserEnergy = true;
                 _this.$axios.post('/weeklyreportapi/user/updateEnergy', _this.userEnergyForm).then((res) => {
                     if (res.data.code === 0) {
-                        console.log('energy res ', res);
+                        // console.log('energy res ', res);
                         _this.getUserList();
                         _this.$q.notify({
                             message: res.data.message,
@@ -239,7 +288,7 @@
     .form-field {
         margin: 12px 0;
     }
-    .btn-create {
+    .btn-group {
         position: relative;
         top: -15px;
     }
@@ -250,6 +299,15 @@
     }
     .task-table {
         border: none;
+    }
+    .example-energy {
+        list-style-type: none;
+        margin: 20px 0;
+        padding: 0;
+        li {
+            display: inline-block;
+            width: 80px;
+        }
     }
     .user-energy-list {
         li {
@@ -267,16 +325,18 @@
                 display: inline-block;
                 width: 70%;
                 vertical-align: middle;
-                .show-energy-desc {
-                    width: 200px!important;
+                .show-energy-desc strong span{
+                    color: #db2828;
                 }
             }
             .update-energy {
                 font-size: 2rem;
                 margin-left: 1rem;
                 cursor: pointer;
+                color: #21ba45;
+                transition:all ease-in .2s;
                 &:hover, &.active {
-                    color: #027be3;
+                    color: #db2828;
                 }
             }
         }
