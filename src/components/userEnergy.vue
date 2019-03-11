@@ -10,20 +10,33 @@
             <ul class="user-energy-list">
                 <li v-for="item in userList" v-bind:key="item._id">
                     <span>{{item.name}}</span>
-                    <q-progress
-                        class="progress-status" 
-                        :percentage="100 - item.energy"
-                        stripe
-                        animate
-                        height="45px"
-                     />
+                    <div class="progress-status" :style="{width: user.role !== 1 ? '80%': ''}">
+                        <q-progress
+                            class="" 
+                            :percentage="100 - item.energy"
+                            stripe
+                            animate
+                            height="45px"
+                        />
+                        <q-tooltip anchor="top left" self="bottom left" :offset="[10, 10]" class="show-energy-desc" style="min-width: 300px;margin-left:20px;">
+                            <strong>描述</strong>
+                            <p v-if="item.energy_desc !== ''" v-for="(itemP, index) in item.energy_desc.split('\n')" v-bind:key="index" class="show-energy-desc-p" style="min-width: 300px;margin-top: 10px;">
+                                {{itemP}}
+                            </p>
+                            <p v-if="item.energy_desc === ''" class="show-energy-desc-p" style="min-width: 300px;margin-top: 10px;">
+                                暂无
+                            </p>
+                        </q-tooltip>
+                    </div>
+                    
                     <q-icon class="update-energy" name="mode edit" v-if="item.parent === user._id" @click.native="updateEnergy(item)" title="更新能量值" />
+                    
                 </li>
             </ul>
         </q-list>
 
         <q-modal no-esc-dismiss v-model="editUserEnergyModal" @hide="resetForm" :content-css="{padding: '50px', minWidth: '500px'}">
-            <div class="q-display-1 q-mb-md">更新「{{userEnergyForm.name}}」能量值</div>
+            <div class="q-display-1 q-mb-md">更新『{{userEnergyForm.name}}』能量值</div>
             <div>
                 <q-field
                         class="form-field"
@@ -32,6 +45,15 @@
                     <q-input float-label="用户能量值"
                              @input="$v.userEnergyForm.energy.$touch"
                              v-model="userEnergyForm.energy" />
+                </q-field>
+                <q-field
+                        class="form-field"
+                        :error="$v.userEnergyForm.energyDesc.$error"
+                        :error-label="$v.userEnergyForm.energy.maxLength ? errMessage.requireInfo : errMessage.maxInfo">
+                    <q-input float-label="能量使用描述"
+                            type="textarea"
+                             @input="$v.userEnergyForm.energyDesc.$touch"
+                             v-model="userEnergyForm.energyDesc" />
                 </q-field>
             </div>
             <q-btn
@@ -60,18 +82,21 @@
                 userEnergyForm: {
                     id: '',
                     name: '',
-                    energy: 0
+                    energy: 0,
+                    energyDesc: ''
                 },
                 userList: [],
                 errMessage: {
                     requireInfo: '必填',
-                    betweenInfo: '范围：0-100'
+                    betweenInfo: '数值范围 0~100',
+                    maxInfo: '文本长度 < 512'
                 }
             }
         },
         validations: {
             userEnergyForm: {
                 energy: {required, between: between(0,100)},
+                energyDesc: {required, maxLength: maxLength(512)}
             }
         },
         created () {
@@ -112,6 +137,7 @@
                 this.userEnergyForm.id = item._id;
                 this.userEnergyForm.energy = item.energy;
                 this.userEnergyForm.name = item.name;
+                this.userEnergyForm.energyDesc = item.energy_desc;
                 this.editUserEnergyModal = true;
             },
             saveUserEnergy () {
@@ -148,6 +174,7 @@
                 });
             },
             resetForm () {
+                this.userEnergyForm.energyDesc = ''
             },
             handleError (error) {
                 let isExpired = error.response.data.error === 'jwt expired';
@@ -240,6 +267,9 @@
                 display: inline-block;
                 width: 70%;
                 vertical-align: middle;
+                .show-energy-desc {
+                    width: 200px!important;
+                }
             }
             .update-energy {
                 font-size: 2rem;

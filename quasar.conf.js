@@ -79,7 +79,8 @@ module.exports = function (ctx) {
         'QCardActions',
         'QAlert',
         'QSearch',
-        'QProgress'
+        'QProgress',
+        'QTooltip'
       ],
       directives: [
         'Ripple'

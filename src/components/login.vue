@@ -57,9 +57,12 @@
         },
         created () {
 //            this.getInitData();
+            
+        },
+        mounted () {
             const _this = this;
             document.onkeyup = (e) => {
-                if (window.event.keyCode === 13) _this.login();
+                if (location.href.indexOf('login') > 0 && window.event.keyCode === 13) _this.login();
             }
         },
         methods: {
