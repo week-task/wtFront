@@ -934,6 +934,9 @@
     }
 </style>
 <style lang="less">
+    body {
+        min-width: 1028px;
+    }
     .q-table-top {
         position: absolute;
         top: -45px;

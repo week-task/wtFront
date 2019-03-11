@@ -10,37 +10,19 @@
 
         <ul class="example-energy">
             <li>
-                <q-progress
-                    class="" 
-                    :percentage="100"
-                    color="negative"
-                    stripe
-                    animate
-                    height="45px"
-                />
+                <q-progress class="" :percentage="100" color="negative" stripe animate height="40px" />
                 Busy
             </li>
             <li>
-                <q-progress
-                    class="" 
-                    :percentage="100"
-                    color="warning"
-                    stripe
-                    animate
-                    height="45px"
-                />
+                <q-progress class="" :percentage="100" color="warning" stripe animate height="40px" />
                 Normal
             </li>
             <li>
-                <q-progress
-                    class="" 
-                    :percentage="100"
-                    color="positive"
-                    stripe
-                    animate
-                    height="45px"
-                />
+                <q-progress class="" :percentage="100" color="positive" stripe animate height="40px" />
                 Free
+            </li>
+            <li class="free-rate">
+                总体闲置率：<span>{{freeRate}}%</span>
             </li>
         </ul>
 
@@ -55,7 +37,7 @@
                             :color="item.color"
                             stripe
                             animate
-                            height="45px"
+                            height="40px"
                         />
                         <q-tooltip anchor="top left" self="bottom left" :offset="[10, 10]" class="show-energy-desc" style="min-width: 300px;margin-left:20px;">
                             <strong>描述：剩余能量<span style="color:yellow;">{{item.energy}}</span></strong>
@@ -120,6 +102,7 @@
                 progressModel: 30,
                 queue: '',
                 isShowGroup: false,
+                freeRate: 0,
                 colorCard:{
 
                 },
@@ -169,6 +152,7 @@
                     if (res.data.code === 0) {
                         if (res.data.data.length > 0) {
                             _this.userList = res.data.data;
+                            _this.countFreeRate(res.data.data);
                             // console.log('userEnergy users => ', res.data.data);
                         } else if (res.data.data.length === 0) {
                             _this.userList = [];
@@ -188,6 +172,18 @@
             checkSelfGroup (isShowSelfGroup) {
                 this.isShowGroup = isShowSelfGroup;
                 this.getUserList();
+            },
+            countFreeRate (userList) {
+                const _this = this;
+                const allEnergy = userList.length * 100;
+                let freeEnergy = 0;
+
+                for(let i = 0, size = userList.length; i < size; i++) {
+                    let item = userList[i];
+                    freeEnergy += parseInt(item.energy);
+                }
+
+                _this.freeRate = (freeEnergy / allEnergy).toFixed(2) * 100;
             },
             saveUserEnergy () {
                 const _this = this;
@@ -308,6 +304,11 @@
             display: inline-block;
             width: 80px;
             margin-right: 10px;
+            &.free-rate {
+                width: 150px;
+                height: 50px;
+                vertical-align: bottom;
+            }
         }
     }
     .user-energy-list {
