@@ -307,6 +307,7 @@
         li {
             display: inline-block;
             width: 80px;
+            margin-right: 10px;
         }
     }
     .user-energy-list {
