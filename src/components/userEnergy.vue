@@ -298,7 +298,7 @@
     }
     .example-energy {
         list-style-type: none;
-        margin: 20px 0;
+        margin: 10px 0;
         padding: 0;
         li {
             display: inline-block;
@@ -316,14 +316,14 @@
             list-style-type: none;
             margin-bottom: 8px;
             span {
-                font-size: 20px;
+                font-size: 18px;
                 display: inline-block;
-                line-height: 45px;
+                line-height: 40px;
                 margin-right: 10px;
                 width: 100px;
             }
             .progress-status{
-                height: 45px;
+                height: 40px;
                 display: inline-block;
                 width: 70%;
                 vertical-align: middle;
