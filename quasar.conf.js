@@ -80,7 +80,9 @@ module.exports = function (ctx) {
         'QAlert',
         'QSearch',
         'QProgress',
-        'QTooltip'
+        'QTooltip',
+        'QInnerLoading',
+        'QSpinnerGears'
       ],
       directives: [
         'Ripple'

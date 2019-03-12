@@ -27,7 +27,7 @@
         </ul>
 
         <q-list separator>
-            <ul class="user-energy-list">
+            <ul v-show="showCallbackData" class="user-energy-list">
                 <li v-for="item in userList" v-bind:key="item._id">
                     <span>{{item.name}}</span>
                     <div class="progress-status" :style="{width: user.role === 2 ? '80%': ''}">
@@ -49,11 +49,14 @@
                             </p>
                         </q-tooltip>
                     </div>
-                    
+                    <div class="updated-time">{{item.updated_at}}</div>
                     <q-icon class="update-energy" name="adjust" v-if="item.parent === user._id || user.role === 0" @click.native="updateEnergy(item)" title="更新能量值" />
                     
                 </li>
             </ul>
+            <q-inner-loading :visible="visible">
+                <q-spinner-hourglass size="50px" color="primary" />
+            </q-inner-loading>
         </q-list>
 
         <q-modal no-esc-dismiss v-model="editUserEnergyModal" @hide="resetForm" :content-css="{padding: '50px', minWidth: '500px'}">
@@ -99,6 +102,8 @@
             return {
                 editUserEnergyModal: false,
                 loadingUserEnergy: false,
+                showCallbackData: false,
+                visible: false,
                 progressModel: 30,
                 queue: '',
                 isShowGroup: false,
@@ -142,6 +147,8 @@
             },
             getUserList () {
                 const _this = this;
+                _this.visible = true;
+                _this.showCallbackData = false;
                 // 获取所有属于该team下的users
                 _this.$axios.post('/weeklyreportapi/getUserList', {
                     type: 'usersEnergy', 
@@ -153,6 +160,8 @@
                         if (res.data.data.length > 0) {
                             _this.userList = res.data.data;
                             _this.countFreeRate(res.data.data);
+                            _this.visible = false;
+                            _this.showCallbackData = true;
                             // console.log('userEnergy users => ', res.data.data);
                         } else if (res.data.data.length === 0) {
                             _this.userList = [];
@@ -315,6 +324,7 @@
         li {
             list-style-type: none;
             margin-bottom: 8px;
+            position: relative;
             span {
                 font-size: 18px;
                 display: inline-block;
@@ -330,6 +340,13 @@
                 .show-energy-desc strong span{
                     color: #db2828;
                 }
+            }
+            .updated-time {
+                position: absolute;
+                top: 12px;
+                left: 127px;
+                color: #333;
+                opacity: .8;
             }
             .update-energy {
                 font-size: 2rem;
