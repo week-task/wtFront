@@ -418,6 +418,7 @@
                 const _this = this;
                 _this.user = JSON.parse(localStorage.getItem('user'));
                 _this.visibleTopInfoAlert = localStorage.getItem('notshow') === '1' ? false : true;
+                // _this.getUserList();
                 _this.isAdmin = _this.user.role === 0;
                 _this.showUser = _this.user.role !== 2;
                 _this.taskForm.user_id = _this.user._id;
@@ -607,7 +608,7 @@
                                 value: item._id
                             })
                         }
-                        console.log(_this.usersOptions);
+                        // console.log('user flat: ', res);
                     } 
                 }).catch((error)=>{
                     _this.handleError(error);

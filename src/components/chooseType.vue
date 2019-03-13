@@ -1,10 +1,23 @@
 <template>
-    <div class="project">
+    <!-- <div class="project">
         <em class="team-title"></em>
         <q-breadcrumbs class="bread" separator="●" color="light" active-color="dark">
             <q-breadcrumbs-el label="HOME" to="/" />
             <q-breadcrumbs-el label="PROJECT" to="/project" />
         </q-breadcrumbs>
+    </div> -->
+    <div class="choose-type">
+        <em>Make a choice</em>
+        <!-- <q-card v-for="(item, index) in teamList" inline class="q-ma-sm" :key="index" >
+            <q-card-title>
+                {{item.name}}
+                <span slot="subtitle">负责人：{{item.leader.name}}</span>
+            </q-card-title>
+            <q-card-actions>
+                <q-btn flat color="dark" @click="editTeam(item)">编辑</q-btn>
+                <q-btn flat color="light" @click="delTeam(item)">删除</q-btn>
+            </q-card-actions>
+        </q-card> -->
     </div>
 </template>
 

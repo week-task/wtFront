@@ -5,6 +5,8 @@
             <q-breadcrumbs-el label="HOME" to="/" />
             <q-breadcrumbs-el label="USER" to="/user" />
         </q-breadcrumbs>
+        <q-btn icon="format align right" label="FORMAT" @click="showAllUser" class="btn-create" />
+        <q-btn icon="format align justify" label="FLAT" @click="showFlatUser" class="btn-create" />
         <q-btn icon="add" label="USER" @click="createUser" class="btn-create" />
         <q-list separator>
             <q-collapsible v-for="(item, index) in tableData" open icon="forum" :label="item.user" :key="index">
@@ -68,6 +70,15 @@
                             float-label="小组长"
                             :options="parentOptions"/>
                 </q-field>
+                <q-field
+                        class="form-field"
+                        :error="$v.userForm.pRole.$error"
+                        :error-label="errMessage.requireInfo">
+                    <q-select
+                            v-model="userForm.pRole"
+                            float-label="项目角色"
+                            :options="pRoleOptions"/>
+                </q-field>
             </div>
             <q-btn
                     :loading="loadingUser"
@@ -94,9 +105,12 @@
                 createUserModal: false,
                 paginationControl: {rowsPerPage: 0, page: 1},
                 user: {},
+                type: 'all',
                 columns: [
                     {name: '用户', label: '用户', field: 'name', align: 'left'},
                     {name: '状态', label: '状态', field: 'statusZh', align: 'center'},
+                    {name: '角色', label: '角色', field: 'roleZh', align: 'center'},
+                    {name: '项目角色', label: '项目角色', field: 'pRoleZh', align: 'center'},
                 ],
                 userForm: {
                     id: '',
@@ -104,7 +118,8 @@
                     role: 2,
                     status: 0,
                     parent: '',
-                    team: ''
+                    team: '',
+                    pRole: 0
                 },
                 parentOptions: [],
                 statusOptions: [
@@ -114,6 +129,10 @@
                 roleOptions: [
                     {label: '小组长', value: 1},
                     {label: '组员', value: 2}
+                ],
+                pRoleOptions: [
+                    {label: '项目经理', value: 1},
+                    {label: '成员', value: 0}
                 ],
                 tableDataMock: [{
                     user: '李茂',
@@ -149,6 +168,7 @@
                 parent: {},
                 role: {required},
                 status: {required},
+                pRole: {required}
             }
         },
         created () {
@@ -183,14 +203,25 @@
                     _this.handleError(error);
                 });
             },
+            showAllUser () {
+                const _this = this;
+                _this.type = 'all';
+                _this.getUserList();
+            },
+            showFlatUser () {
+                const _this = this;
+                _this.type = 'teamUsers';
+                _this.getUserList();
+            },
             getUserList () {
                 const _this = this;
                 // 获取所有属于该team下的users
-                _this.$axios.post('/weeklyreportapi/getUserList', {type: 'all', team: _this.user.team}).then((res) => {
+                _this.$axios.post('/weeklyreportapi/getUserList', {type: _this.type, team: _this.user.team}).then((res) => {
                     if (res.data.code === 0) {
                         if (res.data.data.length > 0) {
+                            // console.log('res==== ', res.data.data);
                             _this.tableData = res.data.data;
-                            console.log(res.data.data);
+                            
                         } else if (res.data.data.length === 0) {
                             _this.tableData = [{
                                 user: '暂无数据',
@@ -219,6 +250,7 @@
                 _this.userForm.status = props[0].status;
                 _this.userForm.parent = props[0].parent;
                 _this.userForm.team = props[0].team;
+                _this.userForm.pRole = props[0].pRole;
             },
             saveUser () {
                 const _this = this;
