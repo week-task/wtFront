@@ -21,7 +21,7 @@ export default [
     }
   },
   {
-    path: '/project_type',
+    path: '/chooseType',
     component: () => import('components/chooseType'),
     meta: {
       requireAuth: true

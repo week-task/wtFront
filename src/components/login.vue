@@ -83,6 +83,7 @@
                 _this.$axios.post('/weeklyreportapi/login', _this.loginParams).then((res) => {
                     if (res.data.code === 0) {
                         const authInfo = res.data.data;
+                        // console.log('authinfo => ', authInfo)
                         setTimeout(()=>{
                             _this.loading = false;
                             localStorage.setItem('user', JSON.stringify(authInfo.user));
@@ -92,11 +93,15 @@
                             if (authInfo.user.role === -1) {
                                 _this.$router.push('/admin');
                             } else {
-                                _this.$router.push('/');
+                                if (authInfo.user.pRole === 1) {
+                                    _this.$router.push('/chooseType');
+                                } else {
+                                    _this.$router.push('/');
+                                }
                             }
                         }, 1000);
                     } else {
-                        console.log(res);
+                        // console.log(res);
                         _this.loading = false;
                         _this.$q.dialog({
                             title: 'Error',
