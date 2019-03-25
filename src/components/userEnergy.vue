@@ -39,6 +39,7 @@
                             animate
                             height="40px"
                         />
+                        <div class="updated-time">{{item.updated_at}}</div>
                         <q-tooltip anchor="top left" self="bottom left" :offset="[10, 10]" class="show-energy-desc" style="min-width: 300px;margin-left:20px;">
                             <strong>描述：剩余能量<span style="color:yellow;">{{item.energy}}</span></strong>
                             <p v-if="item.energy_desc !== ''" v-for="(itemP, index) in item.energy_desc.split('\n')" v-bind:key="index" class="show-energy-desc-p" style="min-width: 300px;margin-top: 10px;">
@@ -49,7 +50,7 @@
                             </p>
                         </q-tooltip>
                     </div>
-                    <div class="updated-time">{{item.updated_at}}</div>
+                    
                     <q-icon class="update-energy" name="adjust" v-if="item.parent === user._id || user.role === 0" @click.native="updateEnergy(item)" title="更新能量值" />
                     
                 </li>
@@ -184,7 +185,7 @@
             },
             countFreeRate (userList) {
                 const _this = this;
-                const allEnergy = userList.length * 100;
+                const allEnergy = userList.length;
                 let freeEnergy = 0;
 
                 for(let i = 0, size = userList.length; i < size; i++) {
@@ -192,7 +193,7 @@
                     freeEnergy += parseInt(item.energy);
                 }
 
-                _this.freeRate = (freeEnergy / allEnergy).toFixed(2) * 100;
+                _this.freeRate = (freeEnergy / allEnergy).toFixed(2);
             },
             saveUserEnergy () {
                 const _this = this;
@@ -314,7 +315,7 @@
             width: 80px;
             margin-right: 10px;
             &.free-rate {
-                width: 150px;
+                width: 450px;
                 height: 50px;
                 vertical-align: bottom;
             }
@@ -337,17 +338,19 @@
                 display: inline-block;
                 width: 70%;
                 vertical-align: middle;
+                position: relative;
                 .show-energy-desc strong span{
                     color: #db2828;
                 }
+                .updated-time {
+                    position: absolute;
+                    top: 12px;
+                    right: 20px;
+                    color: #333;
+                    opacity: .8;
+                }
             }
-            .updated-time {
-                position: absolute;
-                top: 12px;
-                left: 127px;
-                color: #333;
-                opacity: .8;
-            }
+            
             .update-energy {
                 font-size: 2rem;
                 margin-left: 1rem;

@@ -49,6 +49,13 @@ export default [
     }
   },
   {
+    path: '/pm',
+    component: () => import('layouts/pm/pm'),
+    meta: {
+      requireAuth: true
+    }
+  },
+  {
     path: '/admin',
     component: () => import('components/admin/admin'),
     meta: {
