@@ -14,8 +14,8 @@
             更新日志 v1.3.1<br>
             <br>
             ● 优化能量图时间展示<br>
-            ● 新增模块：项目经理周报<br>
-            ● 优化入口：所有人员新增控制台模块
+            ● 优化入口：所有人员新增控制台模块<br>
+            ● 新增模块：项目经理周报
         </q-alert>
         <a class="good relative-position" v-ripple="true" @click="$router.push('/')">
             <img src="statics/types/week.jpg" alt="">
