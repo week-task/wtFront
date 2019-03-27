@@ -17,7 +17,7 @@
         </q-alert>
         <em class="team-title">{{user.teamName}} 周报系统</em>
         <q-breadcrumbs separator="●" color="light" active-color="dark" class="navigator">
-            <q-breadcrumbs-el label="HOME" to="/" />
+            <q-breadcrumbs-el label="HOME" to="/console" />
             <!--<q-breadcrumbs-el label="Project" to="/project" />-->
         </q-breadcrumbs>
 
@@ -38,7 +38,7 @@
         <q-btn icon="code" label="PROJECT" @click="createProject" class="btn-create" v-if="showUser" />
         <q-btn icon="add" label="TASK" @click="createTask" class="btn-create" v-if="!historyTask" />
         <q-btn icon="mode edit" label="PASS" @click="changePasswordModal" class="btn-create" />
-        <q-btn icon="whatshot" label="ENERGY" @click="redirectEnergy" class="btn-create" />
+        <!-- <q-btn icon="whatshot" label="ENERGY" @click="redirectEnergy" class="btn-create" /> -->
         <q-icon class="btn-create hide-size" name="visibility" v-if="isHide" @click.native="getReportHideData" title="隐藏未更新任务" />
         <q-icon class="btn-create hide-size active" name="visibility_off" v-if="!isHide" @click.native="getReportNormalData" title="显示全部" />
 

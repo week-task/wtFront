@@ -21,8 +21,8 @@ export default [
     }
   },
   {
-    path: '/chooseType',
-    component: () => import('components/chooseType'),
+    path: '/console',
+    component: () => import('components/console'),
     meta: {
       requireAuth: true
     }

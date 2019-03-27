@@ -5,74 +5,50 @@
             <q-breadcrumbs-el label="HOME" to="/" />
             <q-breadcrumbs-el label="PROJECT MANAGER" to="/pm" />
         </q-breadcrumbs>
-        <q-btn icon="format align right" label="FORMAT" @click="showAllUser" class="btn-create" />
-        <q-btn icon="format align justify" label="FLAT" @click="showFlatUser" class="btn-create" />
-        <q-btn icon="add" label="USER" @click="createUser" class="btn-create" />
+        
+        <div class="report-tree-select">
+            <q-select
+                v-model="selectYear"
+                :options="yearPeriodOptions"
+                class="select-right"/>
+            <q-select
+                v-model="select"
+                :options="periodOptions"
+                class="select-right"/>
+        </div>
+
         <q-list separator>
-            <q-collapsible v-for="(item, index) in tableData" open icon="forum" :label="item.user" :key="index" header-class="bg-red text-white">
-                <div>
-                    <p>1、开发者中心 开发中 100%。</p>
-                    <p>2、开发者中心 开发中 100%。</p>
-                    <p>3、开发者中心 开发中 100%。</p>
-                </div>
+            <q-collapsible v-for="(item, index) in mtaskData" open icon="layers" :label="item.user && item.user.name" :key="index" :header-class="item.period ? '' : 'bg-red text-white'">
+                <q-btn v-if="item.info === '' && item.user && item.user.name === user.name && select === currentSelect" color="positive" flat icon="add" label="MTASK" @click="createMtask" class="btn-create" />
+                <q-btn v-if="item.info !== '' && item.user && item.user.name === user.name && select === currentSelect" color="positive" flat icon="mode edit" label="编辑" @click="editMtask(item)"  />
+                <p v-if="item && item.info && item.info !== ''" v-for="(itemP, index) in item.info.split('\n')" v-bind:key="index" class="show-energy-desc-p" style="min-width: 300px;margin-top: 10px;">
+                    {{itemP}}
+                </p>
+
+                <p v-if="!item.info">暂未填项目经理周报</p>
+                <!-- {{item.info}} -->
             </q-collapsible>
         </q-list>
 
-        <q-modal v-model="createUserModal" @hide="resetForm" :content-css="{padding: '50px', minWidth: '500px'}">
-            <div v-if="!isEdit" class="q-display-1 q-mb-md">创建用户</div>
-            <div v-if="isEdit" class="q-display-1 q-mb-md">编辑用户</div>
+        <q-modal v-model="createMtaskModal" @hide="resetForm" :content-css="{padding: '50px', minWidth: '500px'}">
+            <div v-if="!isEdit" class="q-display-1 q-mb-md">Create</div>
+            <div v-if="isEdit" class="q-display-1 q-mb-md">Edit</div>
             <div>
                 <q-field
                         class="form-field"
-                        :error="$v.userForm.name.$error"
-                        :error-label="$v.userForm.name.maxLength ? errMessage.requireInfo : errMessage.maxInfo">
-                    <q-input float-label="用户名"
-                             @input="$v.userForm.name.$touch"
-                             v-model="userForm.name" />
-                </q-field>
-                <q-field
-                        class="form-field"
-                        :error="$v.userForm.status.$error"
-                        :error-label="errMessage.requireInfo">
-                    <q-select
-                            v-model="userForm.status"
-                            float-label="状态"
-                            :options="statusOptions"/>
-                </q-field>
-                <q-field
-                        class="form-field"
-                        :error="$v.userForm.role.$error"
-                        :error-label="errMessage.requireInfo">
-                    <q-select
-                            v-model="userForm.role"
-                            float-label="角色"
-                            :options="roleOptions"/>
-                </q-field>
-                <q-field
-                        class="form-field"
-                        :error="$v.userForm.parent.$error"
-                        :error-label="errMessage.requireInfo">
-                    <q-select
-                            v-if="userForm.role === 2"
-                            v-model="userForm.parent"
-                            float-label="小组长"
-                            :options="parentOptions"/>
-                </q-field>
-                <q-field
-                        class="form-field"
-                        :error="$v.userForm.pRole.$error"
-                        :error-label="errMessage.requireInfo">
-                    <q-select
-                            v-model="userForm.pRole"
-                            float-label="项目角色"
-                            :options="pRoleOptions"/>
+                        :error="$v.mtaskForm.info.$error"
+                        :error-label="$v.mtaskForm.info.maxLength ? errMessage.requireInfo : errMessage.maxInfo">
+                    <q-input float-label="周报细节"
+                            type="textarea"
+                            @input="$v.mtaskForm.info.$touch"
+                            v-model="mtaskForm.info" />
                 </q-field>
             </div>
             <q-btn
-                    :loading="loadingUser"
+                    :loading="loadingMtask"
                     color="primary"
                     class="btn-save"
-                    @click="saveUser">
+                    @click="saveMtask">
                 保存
                 <q-spinner-hourglass slot="loading" size="20px" />
                 <span slot="loading">Loading...</span>
@@ -84,79 +60,42 @@
 
 <script>
     import {required, minLength, maxLength} from 'vuelidate/lib/validators';
+    import {date} from 'quasar';
     export default {
-        name: 'User',
+        name: 'Pm',
         data () {
             return {
                 isEdit: false,
-                loadingUser: false,
-                createUserModal: false,
+                isAdmin: false,
+                loadingMtask: false,
+                createMtaskModal: false,
+                select: '2019-03-22',
+                currentSelect: '',
+                weekOfYear: '',
+                selectYear: '2019',
                 paginationControl: {rowsPerPage: 0, page: 1},
                 user: {},
                 type: 'all',
-                columns: [
-                    {name: '用户', label: '用户', field: 'name', align: 'left'},
-                    {name: '状态', label: '状态', field: 'statusZh', align: 'center'},
-                    {name: '角色', label: '角色', field: 'roleZh', align: 'center'},
-                    {name: '项目角色', label: '项目角色', field: 'pRoleZh', align: 'center'},
+                periodOptions: [],
+                yearPeriodOptions: [
+                    {label: '2019年', value: '2019'}
                 ],
-                userForm: {
+                mtaskForm: {
                     id: '',
-                    name: '',
-                    role: 2,
-                    status: 0,
-                    parent: '',
-                    team: '',
-                    pRole: 0
+                    user_id: '',
+                    info: '',
+                    team: ''
                 },
-                parentOptions: [],
-                statusOptions: [
-                    {label: '在职', value: 0},
-                    {label: '离职', value: 1}
-                ],
-                roleOptions: [
-                    {label: '小组长', value: 1},
-                    {label: '组员', value: 2}
-                ],
-                pRoleOptions: [
-                    {label: '项目经理', value: 1},
-                    {label: '成员', value: 0}
-                ],
-                tableDataMock: [{
-                    user: '李茂',
-                    selected: [],
-                    data: [
-                        {id: 1, name: '霍金芳', statusZh: '在职'},
-                        {id: 2, name: '朱华兵', statusZh: '在职'},
-                        {id: 3, name: '陈波', statusZh: '在职'}
-                    ]
-                }, {
-                    user: '骆林佳',
-                    selected: [],
-                    data: [
-                        {id: 1, name: '巧巧', statusZh: '在职'},
-                        {id: 2, name: '高宇', statusZh: '在职'},
-                        {id: 3, name: '周杨', statusZh: '在职'}
-                    ]
-                }],
-                tableData: [{
-                    project: '暂无数据',
-                    selected: [],
-                    data: []
-                }],
+                mtaskData: [],
                 errMessage: {
                     requireInfo: '必填',
-                    maxInfo: '名字不可以超过5个字符'
+                    maxInfo: '文本长度 < 512'
                 }
             }
         },
         validations: {
-            userForm: {
-                name: {required, maxLength: maxLength(5)},
-                parent: {},
-                role: {required},
-                status: {required},
-                pRole: {required}
+            mtaskForm: {
+                info: {required, maxLength: maxLength(512)}
             }
         },
         created () {
@@ -167,90 +106,99 @@
 //            }
             this.init();
         },
+        watch: {
+            select: function () {
+                this.weekOfYear = this.select;
+                this.getMtaskList();
+            },
+            selectYear: function() {
+                this.renderPeriods();
+            }
+        },
         methods: {
             init () {
                 const _this = this;
                 _this.user = JSON.parse(localStorage.getItem('user'));
-                _this.getUserList();
+                _this.isAdmin = _this.user.role === 0;
+                _this.renderPeriods();
+                // _this.getMtaskList();
             },
-            getParentList () {
-                const _this = this;
-                // 获取role=1的小组长角色
-                _this.$axios.post('/weeklyreportapi/getUserList', {type: 'options', team: _this.user.team}).then((res) => {
-                    if (res.data.code === 0) {
-                        _this.parentOptions = [];
-                        for (let i = 0, size = res.data.data.length; i < size; i++) {
-                            let item = res.data.data[i];
-                            _this.parentOptions.push({
-                                label: item.name,
-                                value: item._id
-                            })
-                        }
-                    } 
-                }).catch((error)=>{
-                    _this.handleError(error);
-                });
+            getWeekOfYear () {
+                let tempWeekOfYear = date.formatDate(Date.now(), 'w');
+                this.weekOfYear = date.formatDate(Date.now(), 'd') === '0' ? parseInt(tempWeekOfYear) + 1 : tempWeekOfYear;
+                // console.log('weekOfyaer', this.weekOfYear);
             },
-            showAllUser () {
+            renderPeriods () {
                 const _this = this;
-                _this.type = 'all';
-                _this.getUserList();
+                _this.periodOptions = [];
+                _this.getWeekOfYear();
+                
+                // console.log(date.formatDate(new Date(2018, 11, 30), 'w'))
+                // update the time on 2019-01-03
+                for (let i = (_this.selectYear === '2018' ? 52 : parseInt(_this.weekOfYear)); i > (_this.selectYear === '2019' ? 12 : 0); i--) {
+                    _this.periodOptions.push({
+                        label: (_this.isAdmin ? '' : _this.user.name + ' ') + '第'+ i + '期项目经理周报',
+                        value: i
+                    });
+                }
+                _this.select = parseInt(_this.weekOfYear);
+                _this.currentSelect === '' ? _this.currentSelect = parseInt(_this.weekOfYear) : '';
             },
-            showFlatUser () {
+            getMtaskList () {
                 const _this = this;
-                _this.type = 'teamUsers';
-                _this.getUserList();
-            },
-            getUserList () {
-                const _this = this;
-                // 获取所有属于该team下的users
-                _this.$axios.post('/weeklyreportapi/getUserList', {type: _this.type, team: _this.user.team}).then((res) => {
+                let queryParams = {
+                    year: _this.selectYear,
+                    period: _this.weekOfYear,
+                    userid: _this.user._id,
+                    team: _this.user.team
+                };
+                // 获取所有该期的项目经理周报
+                _this.$axios.post('/weeklyreportapi/mtask/getMtaskList', queryParams).then((res) => {
                     if (res.data.code === 0) {
                         if (res.data.data.length > 0) {
                             // console.log('res==== ', res.data.data);
-                            _this.tableData = res.data.data;
-                            
-                        } else if (res.data.data.length === 0) {
-                            _this.tableData = [{
-                                user: '暂无数据',
-                                selected: [],
-                                data: []
-                            }];
-                        }
+                            _this.mtaskData = res.data.data;
+                            _this.getIsEdit();
+                        } 
                     } 
                 }).catch((error)=>{
                     _this.handleError(error);
                 });
             },
-            createUser () {
-                this.createUserModal = true;
-                this.getParentList();
+            createMtask () {
+                this.createMtaskModal = true;
+                // this.getParentList();
             },
-            editUser (props) {
+            getIsEdit () {
+                const _this = this;
+                for (let i = 0, size = _this.mtaskData.length; i < size; i++) {
+                    if (_this.mtaskData[i].user.name === _this.user.name && _this.mtaskData[i].info) {
+                        _this.isEdit = true;
+                    }
+                }
+            },
+            editMtask (props) {
                 const _this = this;
                 _this.isEdit = true;
-                _this.createUserModal = true;
-                _this.getParentList();
-                // console.log('props ', props);
-                _this.userForm.id = props[0].id;
-                _this.userForm.name = props[0].name;
-                _this.userForm.role = props[0].role;
-                _this.userForm.status = props[0].status;
-                _this.userForm.parent = props[0].parent;
-                _this.userForm.team = props[0].team;
-                _this.userForm.pRole = props[0].pRole;
+                _this.createMtaskModal = true;
+                // _this.getParentList();
+                console.log('props ', props);
+                _this.mtaskForm.id = props._id;
+                _this.mtaskForm.info = props.info;
             },
-            saveUser () {
+            saveMtask () {
                 const _this = this;
-                _this.$v.userForm.$touch();
-                _this.userForm.team = _this.user.team;                
-                if (_this.$v.userForm.$error) {
+                _this.$v.mtaskForm.$touch();
+                _this.mtaskForm.team = _this.user.team;                
+                _this.mtaskForm.user_id = _this.user._id;
+                if (_this.$v.mtaskForm.$error) {
                     return;
                 }
-                _this.loadingUser = true;
-                _this.$axios.post(_this.isEdit?'/weeklyreportapi/user/edit':'/weeklyreportapi/user/add', _this.userForm).then((res) => {
+                _this.loadingMtask = true;
+                _this.$axios.post(_this.isEdit?'/weeklyreportapi/mtask/edit':'/weeklyreportapi/mtask/add', _this.mtaskForm).then((res) => {
                     if (res.data.code === 0) {
-                        _this.getUserList();
+                        _this.getMtaskList();
+                        // console.log('save pm info => ', res);
                         _this.$q.notify({
                             message: res.data.message,
                             timeout: 3000,
@@ -258,12 +206,12 @@
                             position: 'top'
                         });
                         setTimeout(()=>{
-                            _this.loadingUser = false;
-                            _this.createUserModal = false;
+                            _this.loadingMtask = false;
+                            _this.createMtaskModal = false;
                             _this.isEdit = false;
                         }, 1000);
                     } else {
-                        _this.loadingUser = false;
+                        _this.loadingMtask = false;
                         _this.$q.dialog({
                             title: 'Error',
                             message: res.data.message
@@ -273,78 +221,11 @@
                     _this.handleError(error);
                 });
             },
-            deleteUser (props) {
-                const _this = this;
-                _this.$q.dialog({
-                    title: '确认',
-                    message: '确认删除该用户吗?',
-                    ok: '删除',
-                    cancel: '再考虑考虑'
-                }).then(() => {
-                    _this.$axios.post('/weeklyreportapi/user/delete', {
-                        id: props[0].id
-                    }).then((res) => {
-                        if (res.data.code === 0) {
-                            _this.getUserList();
-                            _this.$q.notify({
-                                message: '已删除,这下真没了!',
-                                timeout: 3000,
-                                type: 'positive',
-                                position: 'top'
-                            });
-                        }
-                    }).catch((error)=>{
-                        _this.handleError(error);
-                        _this.getUserList();
-                    });
-                }).catch(() => {
-                    _this.$q.notify({
-                        message: '看来你是一个很谨慎的人!',
-                        timeout: 3000,
-                        type: 'info',
-                        position: 'top'
-                    });
-                })
-            },
-            resetPass (props) {
-                const _this = this;
-                _this.$q.dialog({
-                    title: '确认',
-                    message: '确认重置该用户密码吗?',
-                    ok: '重置',
-                    cancel: '再考虑考虑'
-                }).then(() => {
-                    _this.$axios.post('/weeklyreportapi/user/resetpass', {
-                        id: props[0].id
-                    }).then((res) => {
-                        if (res.data.code === 0) {
-                            _this.$q.notify({
-                                message: res.data.message,
-                                timeout: 3000,
-                                type: 'positive',
-                                position: 'top'
-                            });
-                        }
-                    }).catch((error)=>{
-                        _this.handleError(error);
-                    });
-                }).catch(() => {
-                    _this.$q.notify({
-                        message: '看来你是一个很谨慎的人!',
-                        timeout: 3000,
-                        type: 'info',
-                        position: 'top'
-                    });
-                });
-            },
+            
             resetForm () {
                 const _this = this;
-                _this.userForm.id = '';
-                _this.userForm.name = '';
-                _this.userForm.role = 2;
-                _this.userForm.status = 0;
-                _this.userForm.parent = '';
-                _this.userForm.team = '';
+                _this.mtaskForm.id = '';
+                _this.mtaskForm.info = '';
             },
             handleError (error) {
                 let isExpired = error.response.data.error === 'jwt expired';
@@ -369,7 +250,7 @@
                     }
                 } else {
                     this.loading = false;
-                    this.loadingUser = false;
+                    this.loadingMtask = false;
                     this.$q.dialog({
                         title: error.response.status + '',
                         message: error.response.data.message
@@ -399,6 +280,19 @@
             margin: 0;
         }
     }
+    .report-tree-select {
+        position: relative;
+        // right: 0;
+        height: 35px;
+        top: -10px;
+        // margin: 0;
+        .select-right {
+            margin-right: 10px;
+            float: left;
+            // display: inline-block;
+            // width: 300px;
+        }
+    }
     .team-title {
         position: absolute;
         top: -88px;
@@ -411,7 +305,6 @@
     }
     .btn-create {
         position: relative;
-        top: -15px;
     }
     .q-table-container {
         -webkit-box-shadow: none;

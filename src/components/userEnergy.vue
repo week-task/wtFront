@@ -2,7 +2,7 @@
     <div class="user">
         <em class="team-title">{{user.teamName}} 团队成员能量</em>
         <q-breadcrumbs class="bread" separator="●" color="light" active-color="dark">
-            <q-breadcrumbs-el label="HOME" to="/" />
+            <q-breadcrumbs-el label="HOME" to="/console" />
             <q-breadcrumbs-el label="USER ENERGY" to="/userEnergy" />
         </q-breadcrumbs>
         <q-btn icon="group" label="ALL" @click="checkSelfGroup(false)" class="btn-group" title="所有成员" />

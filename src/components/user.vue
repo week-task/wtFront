@@ -2,7 +2,7 @@
     <div class="user">
         <em class="team-title">{{user.teamName}} 用户管理</em>
         <q-breadcrumbs class="bread" separator="●" color="light" active-color="dark">
-            <q-breadcrumbs-el label="HOME" to="/" />
+            <q-breadcrumbs-el label="HOME" to="/console" />
             <q-breadcrumbs-el label="USER" to="/user" />
         </q-breadcrumbs>
         <q-btn icon="format align right" label="FORMAT" @click="showAllUser" class="btn-create" />

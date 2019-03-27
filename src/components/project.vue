@@ -2,7 +2,7 @@
     <div class="project">
         <em class="team-title">{{user.teamName}}项目管理</em>
         <q-breadcrumbs class="bread" separator="●" color="light" active-color="dark">
-            <q-breadcrumbs-el label="HOME" to="/" />
+            <q-breadcrumbs-el label="HOME" to="/console" />
             <q-breadcrumbs-el label="PROJECT" to="/project" />
         </q-breadcrumbs>
         <q-btn icon="add" label="PROJECT" @click="createProject" class="btn-create" />

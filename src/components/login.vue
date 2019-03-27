@@ -93,11 +93,12 @@
                             if (authInfo.user.role === -1) {
                                 _this.$router.push('/admin');
                             } else {
-                                if (authInfo.user.pRole === 1) {
-                                    _this.$router.push('/chooseType');
-                                } else {
-                                    _this.$router.push('/');
-                                }
+                                _this.$router.push('/console');
+                                // if (authInfo.user.pRole === 1) {
+                                //     _this.$router.push('/chooseType');
+                                // } else {
+                                //     _this.$router.push('/');
+                                // }
                             }
                         }, 1000);
                     } else {
