@@ -2,7 +2,7 @@
     <div class="user">
         <em class="team-title">{{user.teamName}} 项目经理周报</em>
         <q-breadcrumbs class="bread" separator="●" color="light" active-color="dark">
-            <q-breadcrumbs-el label="HOME" to="/" />
+            <q-breadcrumbs-el label="HOME" to="/console" />
             <q-breadcrumbs-el label="PROJECT MANAGER" to="/pm" />
         </q-breadcrumbs>
         
@@ -21,7 +21,7 @@
             <q-collapsible v-for="(item, index) in mtaskData" open icon="layers" :label="item.user && item.user.name" :key="index" :header-class="item.period ? '' : 'bg-red text-white'">
                 <q-btn v-if="item.info === '' && item.user && item.user.name === user.name && select === currentSelect" color="positive" flat icon="add" label="MTASK" @click="createMtask" class="btn-create" />
                 <q-btn v-if="item.info !== '' && item.user && item.user.name === user.name && select === currentSelect" color="positive" flat icon="mode edit" label="编辑" @click="editMtask(item)"  />
-                <p v-if="item && item.info && item.info !== ''" v-for="(itemP, index) in item.info.split('\n')" v-bind:key="index" class="show-energy-desc-p" style="min-width: 300px;margin-top: 10px;">
+                <p v-if="item && item.info && item.info !== ''" v-for="(itemP, index) in item.info.split('\n')" v-bind:key="index" class="show-energy-desc-p" style="min-width: 300px;margin-top: 10px;margin-left:20px;">
                     {{itemP}}
                 </p>
 
@@ -31,8 +31,8 @@
         </q-list>
 
         <q-modal v-model="createMtaskModal" @hide="resetForm" :content-css="{padding: '50px', minWidth: '500px'}">
-            <div v-if="!isEdit" class="q-display-1 q-mb-md">Create</div>
-            <div v-if="isEdit" class="q-display-1 q-mb-md">Edit</div>
+            <div v-if="!isEdit" class="q-display-1 q-mb-md">CREATE</div>
+            <div v-if="isEdit" class="q-display-1 q-mb-md">EDIT</div>
             <div>
                 <q-field
                         class="form-field"

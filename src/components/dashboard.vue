@@ -1,24 +1,9 @@
 <template>
     <div class="report-tree">
-        <q-alert
-            v-if="visibleTopInfoAlert"
-            color="positive"
-            icon="access_alarm"
-            appear
-            :actions="[
-                //{ label: '知道了', icon: 'done all', handler: () => { visibleTopInfoAlert = false } }, 
-                //{ label: '不再提示', icon: 'check circle outline', handler: () => { this.notShow() } }
-                { label: '知道了', handler: () => { visibleTopInfoAlert = false } }, 
-                { label: '不再提示', handler: () => { this.notShow() } }
-            ]"
-            class="q-mb-sm top-info"
-        >
-          更新了新的模块：『团队能量图』，也就是下方的『ENERGY』，通过该模块，大家可以清晰地了解团队成员目前的工作能量情况。目前仅支持团队小组长进行更新。有意见欢迎指正！
-        </q-alert>
         <em class="team-title">{{user.teamName}} 周报系统</em>
         <q-breadcrumbs separator="●" color="light" active-color="dark" class="navigator">
             <q-breadcrumbs-el label="HOME" to="/console" />
-            <!--<q-breadcrumbs-el label="Project" to="/project" />-->
+            <q-breadcrumbs-el label="WEEKLY REPORT" to="/" />
         </q-breadcrumbs>
 
         <div class="report-tree-select">
@@ -215,7 +200,6 @@
                 isAdmin: false, // 判断是否是超级管理员
                 showUser: false, // 判断是否是二级管理员
                 visibleAlert: false,
-                visibleTopInfoAlert: true,
                 doneAlert: false,
                 historyTask: false,
                 loading: false,
@@ -417,7 +401,6 @@
             initFormData () {
                 const _this = this;
                 _this.user = JSON.parse(localStorage.getItem('user'));
-                _this.visibleTopInfoAlert = localStorage.getItem('notshow') === '1' ? false : true;
                 // _this.getUserList();
                 _this.isAdmin = _this.user.role === 0;
                 _this.showUser = _this.user.role !== 2;
@@ -757,10 +740,6 @@
             },
             redirectEnergy () {
                 this.$router.push('/userEnergy');
-            },
-            notShow () {
-                window.localStorage.setItem('notshow', '1');
-                this.visibleTopInfoAlert = false;
             },
             changePasswordModal () {
                 this.passwordModal = true;
