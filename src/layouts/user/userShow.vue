@@ -8,21 +8,21 @@
         <!-- <q-btn icon="group" label="ALL" @click="checkSelfGroup(false)" class="btn-group" title="所有成员" />
         <q-btn icon="person" label="GROUP" @click="checkSelfGroup(true)" class="btn-group" title="只关注本组成员" /> -->
         
-        <div v-if="hasFinishedInfo">
+        <div v-if="hasFinishedInfo" style="border:none;">
+            
+                <q-search
+                        color="primary"
+                        v-model="filter"
+                        class="col-6 s-q-search"
+                        style="margin-bottom: 10px;"
+                        />
             <q-table
                 :data="tableData"
                 :columns="columns"
                 :filter="filter"
                 :pagination.sync="paginationControl"
                 >
-                <template slot="top-left" slot-scope="props">
-                    <q-search
-                        color="primary"
-                        v-model="filter"
-                        class="col-6"
-                        style="width:500px;"
-                        />
-                </template>
+                
                 <q-tr slot="body" slot-scope="props" :props="props">
                     <q-td key="name" :props="props" width="25%">
                         {{ props.row.name }}
@@ -433,15 +433,16 @@
             color: red;
         }
     }
-
-   
+    .s-q-search {
+        // top: 50px;
+        // margin: 0 20px;
+        // z-index: 100;
+    }
 </style>
 <style lang="less">
-    // .q-table-top {
-    //     position: absolute;
-    //     top: -45px;
-    //     right: 50px;
-    //     min-height: 0;
-    //     padding: 0;
-    // }
+    .s-q-search {
+        // top: 50px;
+        // margin: 0 20px;
+        // z-index: 100;
+    }
 </style>

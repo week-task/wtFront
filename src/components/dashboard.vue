@@ -912,6 +912,12 @@
         position: absolute;
         top: -200px;
     }
+    
+</style>
+<style lang="less">
+    body {
+        min-width: 1028px;
+    }
     .q-table-top {
         position: absolute;
         top: -45px;
@@ -919,10 +925,4 @@
         min-height: 0;
         padding: 0;
     }
-</style>
-<style lang="less">
-    body {
-        min-width: 1028px;
-    }
-    
 </style>
