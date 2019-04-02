@@ -22,6 +22,9 @@ const Router = new VueRouter({
 });
 
 Router.beforeEach((to, from, next) => {
+  if (to.meta.title) {
+    document.title = to.meta.title;
+  }
   if (to.meta.requireAuth) {
     const token = localStorage.getItem('token');
     if (token && token !== 'null') {

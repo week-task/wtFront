@@ -11,11 +11,11 @@
             ]"
             class="q-mb-sm top-info"
         >
-            更新日志 v1.3.1<br>
+            更新日志 v1.4.1<br>
             <br>
-            ● 优化能量图时间展示<br>
-            ● 优化入口：所有人员新增控制台模块<br>
-            ● 新增模块：项目经理周报
+            ● 优化header的title展示<br>
+            ● 优化项目经理周报复制功能<br>
+            ● 新增模块：成员秀
         </q-alert>
         <a class="good relative-position" v-ripple="true" @click="$router.push('/')">
             <img src="statics/types/week.jpg" alt="">
@@ -28,6 +28,10 @@
         <a class="good relative-position" v-ripple="true" @click="$router.push('/userEnergy')">
             <img src="statics/types/energy.jpg" alt="">
             <p>能量图</p>
+        </a>
+        <a class="good relative-position" v-ripple="true" @click="$router.push('/userShow')">
+            <img src="statics/types/boy-avatar.jpg" alt="">
+            <p>成员秀</p>
         </a>
     </div>
 </template>
@@ -50,10 +54,10 @@
             init () {
                 const _this = this;
                 _this.user = JSON.parse(localStorage.getItem('user'));
-                _this.visibleTopInfoAlert = localStorage.getItem('notshow_console') === 'v1.3.1' ? false : true;
+                _this.visibleTopInfoAlert = localStorage.getItem('notshow_console') === 'v1.4.1' ? false : true;
             },
             notShow () {
-                window.localStorage.setItem('notshow_console', 'v1.3.1');
+                window.localStorage.setItem('notshow_console', 'v1.4.1');
                 this.visibleTopInfoAlert = false;
             },
         }
@@ -136,11 +140,11 @@
     }
 </style>
 <style lang="less">
-    .q-table-top {
-        position: absolute;
-        top: -45px;
-        right: 50px;
-        min-height: 0;
-        padding: 0;
-    }
+    // .q-table-top {
+    //     position: absolute;
+    //     top: -45px;
+    //     right: 50px;
+    //     min-height: 0;
+    //     padding: 0;
+    // }
 </style>

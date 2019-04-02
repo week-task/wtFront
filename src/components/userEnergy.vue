@@ -365,11 +365,11 @@
     }
 </style>
 <style lang="less">
-    .q-table-top {
-        position: absolute;
-        top: -45px;
-        right: 50px;
-        min-height: 0;
-        padding: 0;
-    }
+    // .q-table-top {
+    //     position: absolute;
+    //     top: -45px;
+    //     right: 50px;
+    //     min-height: 0;
+    //     padding: 0;
+    // }
 </style>

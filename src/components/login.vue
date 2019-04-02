@@ -1,6 +1,6 @@
 <template>
     <div class="login">
-        <em>周报系统</em>
+        <em>TT</em>
         <q-field
                 :error="$v.loginParams.username.$error"
                 error-label="必填">

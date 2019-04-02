@@ -21,9 +21,9 @@
             <q-collapsible v-for="(item, index) in mtaskData" open icon="layers" :label="item.user && item.user.name" :key="index" :header-class="item.period ? '' : 'bg-red text-white'">
                 <q-btn v-if="item.info === '' && item.user && item.user.name === user.name && select === currentSelect" color="positive" flat icon="add" label="MTASK" @click="createMtask" class="btn-create" />
                 <q-btn v-if="item.info !== '' && item.user && item.user.name === user.name && select === currentSelect" color="positive" flat icon="mode edit" label="编辑" @click="editMtask(item)"  />
-                <p v-if="item && item.info && item.info !== ''" v-for="(itemP, index) in item.info.split('\n')" v-bind:key="index" class="show-energy-desc-p" style="min-width: 300px;margin-top: 10px;margin-left:20px;">
+                <div v-if="item && item.info && item.info !== ''" v-for="(itemP, index) in item.info.split('\n')" v-bind:key="index" class="show-energy-desc-p" style="min-width: 300px;margin-top: 10px;margin-left:20px;">
                     {{itemP}}
-                </p>
+                </div>
 
                 <p v-if="!item.info">暂未填项目经理周报</p>
                 <!-- {{item.info}} -->
@@ -316,11 +316,11 @@
     }
 </style>
 <style lang="less">
-    .q-table-top {
-        position: absolute;
-        top: -45px;
-        right: 50px;
-        min-height: 0;
-        padding: 0;
-    }
+    // .q-table-top {
+    //     position: absolute;
+    //     top: -45px;
+    //     right: 50px;
+    //     min-height: 0;
+    //     padding: 0;
+    // }
 </style>
