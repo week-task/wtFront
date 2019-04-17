@@ -1,5 +1,9 @@
 <template>
     <div class="choose-type">
+        <slot name="headerTop">
+            <HeaderTop :navList="navList" :funName="funName" :teamName="user.teamName"></HeaderTop>
+        </slot>
+
         <q-alert
             v-if="visibleTopInfoAlert"
             color="positive"
@@ -11,11 +15,13 @@
             ]"
             class="q-mb-sm top-info"
         >
-            更新日志 v1.4.1<br>
+            更新日志 v1.4.2<br>
             <br>
-            ● 优化header的title展示<br>
-            ● 优化项目经理周报复制功能<br>
-            ● 新增模块：成员秀
+            ● 新增LOGO<br>
+            ● 新增头像上传<br>
+            ● 优化header显示<br>
+            ● 整合其他功能到header<br>
+            ● 优化成员秀显示
         </q-alert>
         <a class="good relative-position" v-ripple="true" @click="$router.push('/')">
             <img src="statics/types/week.jpg" alt="">
@@ -37,16 +43,20 @@
 </template>
 
 <script>
+    import HeaderTop from '../layouts/common/header'
     export default {
         name: 'Console',
         data () {
             return {
+                navList: [],
+                funName: '',
                 user: {},
                 visibleTopInfoAlert: true,
                 
             }
         },
         validations: {},
+        components: {HeaderTop},
         created () {
             this.init();
         },
@@ -54,10 +64,10 @@
             init () {
                 const _this = this;
                 _this.user = JSON.parse(localStorage.getItem('user'));
-                _this.visibleTopInfoAlert = localStorage.getItem('notshow_console') === 'v1.4.1' ? false : true;
+                _this.visibleTopInfoAlert = localStorage.getItem('notshow_console') === 'v1.4.2' ? false : true;
             },
             notShow () {
-                window.localStorage.setItem('notshow_console', 'v1.4.1');
+                window.localStorage.setItem('notshow_console', 'v1.4.2');
                 this.visibleTopInfoAlert = false;
             },
         }
@@ -116,6 +126,7 @@
         // background: red;
         display: inline-block;
         margin-right: 20px;
+        margin-bottom: 20px;
         border: 5px solid #333;
         overflow: hidden;
         cursor: pointer;

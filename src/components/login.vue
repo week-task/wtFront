@@ -1,6 +1,27 @@
 <template>
     <div class="login">
-        <em>TT</em>
+        <em>
+            <!-- <img
+                src="~assets/logo.svg"
+                style="width:30px;max-width:150px;"
+            > -->
+            <svg id="ttlogo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50" isolation="isolate" style="width:30px;height:30px;">
+                <g id="xlogo">
+                    <rect x="0" y="0" fill="white" width="23" height="23">
+                        <animate attributeName="fill" calcMode="discrete" values="white;#027be3;#127F78;#db2828" dur=".8s" repeatCount="indefinite" />
+                    </rect>
+                    <rect x="27" y="0" fill="#db2828" width="23" height="23">
+                        <animate attributeName="fill" calcMode="discrete" values="#db2828;white;#027be3;#127F78" dur=".8s" repeatCount="indefinite" />
+                    </rect>
+                    <rect x="27" y="27" fill="#127F78" width="23" height="23">
+                        <animate attributeName="fill" calcMode="discrete" values="#127F78;#db2828;white;#027be3" dur=".8s" repeatCount="indefinite" />
+                    </rect>
+                    <rect x="0" y="27" fill="#027be3" width="23" height="23">
+                        <animate attributeName="fill" calcMode="discrete" values="#027be3;#127F78;#db2828;white" dur=".8s" repeatCount="indefinite" />
+                    </rect>
+                </g>
+            </svg>
+            TT</em>
         <q-field
                 :error="$v.loginParams.username.$error"
                 error-label="必填">
@@ -57,15 +78,24 @@
         },
         created () {
 //            this.getInitData();
-            
         },
         mounted () {
             const _this = this;
+            _this.init();
             document.onkeyup = (e) => {
                 if (location.href.indexOf('login') > 0 && window.event.keyCode === 13) _this.login();
             }
         },
         methods: {
+            init () {
+                document.getElementById('ttlogo').pauseAnimations();
+                document.getElementById('ttlogo').addEventListener('mouseover', function(){
+                    document.getElementById('ttlogo').unpauseAnimations();
+                });
+                document.getElementById('ttlogo').addEventListener('mouseleave', function(){
+                    document.getElementById('ttlogo').pauseAnimations();
+                });
+            },
             login () {
                 const _this = this;
                 _this.$v.loginParams.$touch();
@@ -135,9 +165,10 @@
         position: relative;
         margin-top: 300px;
         em {
-            font-size: 20px;
+            font-size: 30px;
             font-style: normal;
             font-weight: bold;
+            vertical-align: bottom;
         }
     }
     .btn-login {

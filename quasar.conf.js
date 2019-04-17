@@ -82,10 +82,14 @@ module.exports = function (ctx) {
         'QProgress',
         'QTooltip',
         'QInnerLoading',
-        'QSpinnerGears'
+        'QSpinnerGears',
+        'QUploader',
+        'QPageSticky',
+        'QPopover'
       ],
       directives: [
-        'Ripple'
+        'Ripple',
+        'CloseOverlay'
       ],
       plugins: [
         'Notify',

@@ -1,10 +1,9 @@
 <template>
     <div class="user">
-        <em class="team-title">{{user.teamName}} 用户管理</em>
-        <q-breadcrumbs class="bread" separator="●" color="light" active-color="dark">
-            <q-breadcrumbs-el label="HOME" to="/console" />
-            <q-breadcrumbs-el label="USER" to="/user" />
-        </q-breadcrumbs>
+        <slot name="headerTop">
+            <HeaderTop :navList="navList" :funName="funName" :teamName="user.teamName"></HeaderTop>
+        </slot>
+
         <q-btn icon="format align right" label="FORMAT" @click="showAllUser" class="btn-create" />
         <q-btn icon="format align justify" label="FLAT" @click="showFlatUser" class="btn-create" />
         <q-btn icon="add" label="USER" @click="createUser" class="btn-create" />
@@ -96,10 +95,17 @@
 
 <script>
     import {required, minLength, maxLength} from 'vuelidate/lib/validators';
+    import HeaderTop from '../layouts/common/header'
     export default {
         name: 'User',
         data () {
             return {
+                navList: [{
+                    label: 'HOME', toLink: '/console'
+                },{
+                    label: 'USER', toLink: '/user'
+                }],
+                funName: '用户管理',
                 isEdit: false,
                 loadingUser: false,
                 createUserModal: false,
@@ -171,6 +177,7 @@
                 pRole: {required}
             }
         },
+        components: {HeaderTop},
         created () {
 ////            this.getInitData();
 //            const _this = this;

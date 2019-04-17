@@ -1,10 +1,8 @@
 <template>
     <div class="user">
-        <em class="team-title">{{user.teamName}} 项目经理周报</em>
-        <q-breadcrumbs class="bread" separator="●" color="light" active-color="dark">
-            <q-breadcrumbs-el label="HOME" to="/console" />
-            <q-breadcrumbs-el label="PROJECT MANAGER" to="/pm" />
-        </q-breadcrumbs>
+        <slot name="headerTop">
+            <HeaderTop :navList="navList" :funName="funName" :teamName="user.teamName"></HeaderTop>
+        </slot>
         
         <div class="report-tree-select">
             <q-select
@@ -61,10 +59,17 @@
 <script>
     import {required, minLength, maxLength} from 'vuelidate/lib/validators';
     import {date} from 'quasar';
+    import HeaderTop from '../common/header';
     export default {
         name: 'Pm',
         data () {
             return {
+                navList: [{
+                    label: 'HOME', toLink: '/console'
+                },{
+                    label: 'PROJECT MANAGER', toLink: '/pm'
+                }],
+                funName: '项目经理周报',
                 isEdit: false,
                 isAdmin: false,
                 loadingMtask: false,
@@ -98,6 +103,7 @@
                 info: {required, maxLength: maxLength(512)}
             }
         },
+        components: {HeaderTop},
         created () {
 ////            this.getInitData();
 //            const _this = this;
@@ -167,6 +173,7 @@
             },
             createMtask () {
                 this.createMtaskModal = true;
+                this.isEdit = false;
                 // this.getParentList();
             },
             getIsEdit () {
@@ -182,7 +189,7 @@
                 _this.isEdit = true;
                 _this.createMtaskModal = true;
                 // _this.getParentList();
-                console.log('props ', props);
+                // console.log('props ', props);
                 _this.mtaskForm.id = props._id;
                 _this.mtaskForm.info = props.info;
             },
@@ -221,7 +228,6 @@
                     _this.handleError(error);
                 });
             },
-            
             resetForm () {
                 const _this = this;
                 _this.mtaskForm.id = '';

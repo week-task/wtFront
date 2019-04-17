@@ -1,10 +1,8 @@
 <template>
     <div class="project">
-        <em class="team-title">{{user.teamName}}项目管理</em>
-        <q-breadcrumbs class="bread" separator="●" color="light" active-color="dark">
-            <q-breadcrumbs-el label="HOME" to="/console" />
-            <q-breadcrumbs-el label="PROJECT" to="/project" />
-        </q-breadcrumbs>
+        <slot name="headerTop">
+            <HeaderTop :navList="navList" :funName="funName" :teamName="user.teamName"></HeaderTop>
+        </slot>   
         <q-btn icon="add" label="PROJECT" @click="createProject" class="btn-create" />
         <q-list>
             <q-collapsible v-for="(item, index) in tableData" open icon="layers" :label="item.team" :key="index">
@@ -57,10 +55,17 @@
 
 <script>
     import {required, minLength} from 'vuelidate/lib/validators';
+    import HeaderTop from '../layouts/common/header'
     export default {
         name: 'Project',
         data () {
             return {
+                navList: [{
+                    label: 'HOME', toLink: '/console'
+                },{
+                    label: 'PROJECT', toLink: '/project'
+                }],
+                funName: '项目管理',
                 isEdit: false,
                 isSuper: false, //判断是否为超级管理员
                 isAdmin: false, //判断是否是管理员
@@ -98,6 +103,7 @@
                 name: {required}
             }
         },
+        components: {HeaderTop},
         created () {
 ////            this.getInitData();
 //            const _this = this;
@@ -293,19 +299,6 @@
         width: 76%;
         position: relative;
         margin-top: 300px;
-        .bread {
-            position: absolute;
-            left:-8px;
-            top: -60px;
-            margin: 0;
-        }
-    }
-    .team-title {
-        position: absolute;
-        top: -88px;
-        font-style: normal;
-        font-size: 20px;
-        font-weight: bold;
     }
     .btn-create {
         /*margin-top: 10px;*/

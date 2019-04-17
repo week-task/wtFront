@@ -1,0 +1,17 @@
+<svg id="ttlogo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50" isolation="isolate">
+    <g id="xlogo">
+        <rect x="0" y="0" fill="white" width="23" height="23">
+            <animate attributeName="fill" calcMode="discrete" values="white;blue;green;red" dur=".8s" repeatCount="indefinite" />
+        </rect>
+        <rect x="27" y="0" fill="red" width="23" height="23">
+            <animate attributeName="fill" calcMode="discrete" values="red;white;blue;green" dur=".8s" repeatCount="indefinite" />
+        </rect>
+        <rect x="27" y="27" fill="green" width="23" height="23">
+            <animate attributeName="fill" calcMode="discrete" values="green;red;white;blue" dur=".8s" repeatCount="indefinite" />
+        </rect>
+        <rect x="0" y="27" fill="blue" width="23" height="23">
+            <animate attributeName="fill" calcMode="discrete" values="blue;green;red;white" dur=".8s" repeatCount="indefinite" />
+        </rect>
+    </g>
+</svg>
+

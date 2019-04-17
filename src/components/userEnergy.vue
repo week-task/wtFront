@@ -1,10 +1,9 @@
 <template>
     <div class="user">
-        <em class="team-title">{{user.teamName}} 团队成员能量</em>
-        <q-breadcrumbs class="bread" separator="●" color="light" active-color="dark">
-            <q-breadcrumbs-el label="HOME" to="/console" />
-            <q-breadcrumbs-el label="USER ENERGY" to="/userEnergy" />
-        </q-breadcrumbs>
+        <slot name="headerTop">
+            <HeaderTop :navList="navList" :funName="funName" :teamName="user.teamName"></HeaderTop>
+        </slot>
+
         <q-btn icon="group" label="ALL" @click="checkSelfGroup(false)" class="btn-group" title="所有成员" />
         <q-btn icon="person" label="GROUP" @click="checkSelfGroup(true)" class="btn-group" title="只关注本组成员" />
 
@@ -97,10 +96,17 @@
 
 <script>
     import {required, minLength, maxLength, between} from 'vuelidate/lib/validators';
+    import HeaderTop from '../layouts/common/header'
     export default {
         name: 'User',
         data () {
             return {
+                navList: [{
+                    label: 'HOME', toLink: '/console'
+                },{
+                    label: 'USER ENERGY', toLink: '/userEnergy'
+                }],
+                funName: '团队成员能量',
                 editUserEnergyModal: false,
                 loadingUserEnergy: false,
                 showCallbackData: false,
@@ -132,6 +138,7 @@
                 energyDesc: {required, maxLength: maxLength(512)}
             }
         },
+        components: {HeaderTop},
         created () {
             this.init();
         },

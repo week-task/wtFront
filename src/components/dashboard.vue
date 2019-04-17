@@ -1,10 +1,8 @@
 <template>
     <div class="report-tree">
-        <em class="team-title">{{user.teamName}} 周报系统</em>
-        <q-breadcrumbs separator="●" color="light" active-color="dark" class="navigator">
-            <q-breadcrumbs-el label="HOME" to="/console" />
-            <q-breadcrumbs-el label="WEEKLY REPORT" to="/" />
-        </q-breadcrumbs>
+        <slot name="headerTop">
+            <HeaderTop :navList="navList" :funName="funName" :teamName="user.teamName"></HeaderTop>
+        </slot>    
 
         <div class="report-tree-select">
             <q-select
@@ -22,7 +20,7 @@
         <q-btn icon="code" label="USER" @click="redirectUser" class="btn-create" v-if="isAdmin" />
         <q-btn icon="code" label="PROJECT" @click="createProject" class="btn-create" v-if="showUser" />
         <q-btn icon="add" label="TASK" @click="createTask" class="btn-create" v-if="!historyTask" />
-        <q-btn icon="mode edit" label="PASS" @click="changePasswordModal" class="btn-create" />
+        <!-- <q-btn icon="mode edit" label="PASS" @click="changePasswordModal" class="btn-create" /> -->
         <!-- <q-btn icon="whatshot" label="ENERGY" @click="redirectEnergy" class="btn-create" /> -->
         <q-icon class="btn-create hide-size" name="visibility" v-if="isHide" @click.native="getReportHideData" title="隐藏未更新任务" />
         <q-icon class="btn-create hide-size active" name="visibility_off" v-if="!isHide" @click.native="getReportNormalData" title="显示全部" />
@@ -141,58 +139,23 @@
                 <span slot="loading">Loading...</span>
             </q-btn>
         </q-modal>
-
-        <q-modal no-esc-dismiss v-model="passwordModal" :content-css="{padding: '50px', minWidth: '500px'}">
-            <div class="q-display-1 q-mb-md">修改密码</div>
-            <div>
-                <q-field
-                        class="form-field"
-                        :error="$v.passwordForm.oldPassword.$error"
-                        :error-label="errMessage.requireInfo">
-                    <q-input float-label="旧密码"
-                            type="password"
-                             @input="$v.passwordForm.oldPassword.$touch"
-                             v-model="passwordForm.oldPassword" />
-                </q-field>
-                <q-field
-                        class="form-field"
-                        :error="$v.passwordForm.password.$error"
-                        :error-label="$v.passwordForm.password.minLength ? errMessage.requireInfo : errMessage.minInfo">
-                    <q-input float-label="新密码"
-                            type="password"
-                             @input="$v.passwordForm.password.$touch"
-                             v-model="passwordForm.password" />
-                </q-field>
-                <q-field
-                        class="form-field"
-                        :error="$v.passwordForm.confirmPassword.$error"
-                        :error-label="$v.passwordForm.confirmPassword.sameAsPassword ? errMessage.requireInfo : errMessage.sameAsInfo">
-                    <q-input float-label="确认密码"
-                            type="password"
-                             @input="$v.passwordForm.confirmPassword.$touch"
-                             v-model="passwordForm.confirmPassword" />
-                </q-field>
-                <q-btn
-                        :loading="loadingPassword"
-                        color="primary"
-                        class="btn-save"
-                        @click="changePassword">
-                    保存
-                    <q-spinner-hourglass slot="loading" size="20px" />
-                    <span slot="loading">Loading...</span>
-                </q-btn>
-            </div>
-        </q-modal>
     </div>
 </template>
 
 <script>
     import {required, minLength, maxLength, sameAs} from 'vuelidate/lib/validators';
     import {date} from 'quasar';
+    import HeaderTop from '../layouts/common/header'
     export default {
         name: 'REPORT',
         data () {
             return {
+                navList: [{
+                    label: 'HOME', toLink: '/console'
+                },{
+                    label: 'WEEKLY REPORT', toLink: '/'
+                }],
+                funName: '周报系统',
                 search: '',
                 isHide: true,
                 isDeploy: false,
@@ -203,7 +166,6 @@
                 doneAlert: false,
                 historyTask: false,
                 loading: false,
-                loadingPassword: false,
                 createTaskModal: false,
                 passwordModal: false,
                 paginationControl: {rowsPerPage: 0, page: 1},
@@ -375,6 +337,7 @@
                 confirmPassword: {required, sameAsPassword: sameAs('password')}
             }
         },
+        components: {HeaderTop},
         created () {
             this.initFormData();
         },
@@ -741,42 +704,6 @@
             redirectEnergy () {
                 this.$router.push('/userEnergy');
             },
-            changePasswordModal () {
-                this.passwordModal = true;
-            },
-            changePassword () {
-                const _this = this;
-                _this.passwordForm.userId = _this.user._id;
-                _this.$v.passwordForm.$touch();
-                if (_this.$v.passwordForm.$error) {
-                    return;
-                }
-                _this.loadingPassword = true;
-                _this.$axios.post('/weeklyreportapi/user/editpassword', _this.passwordForm).then((res) => {
-                    if (res.data.code === 0) {
-                        _this.getProjectsList();
-                        _this.$q.notify({
-                            message: res.data.message,
-                            timeout: 3000,
-                            type: 'positive',
-                            position: 'top'
-                        });
-                        setTimeout(()=>{
-                            _this.loadingPassword = false;
-                            _this.passwordModal = false;
-                            _this.passwordForm.password = '';
-                        }, 1000);
-                    } else {
-                        _this.loadingPassword = false;
-                        _this.$q.dialog({
-                            title: 'Error',
-                            message: res.data.message
-                        });
-                    }
-                }).catch((error)=>{
-                    _this.handleError(error);
-                });
-            },
             exportExcel () {
                 this.$axios.post('/weeklyreportapi/export', {period: this.weekOfYear, team:this.user.team}).then((res) => {
                     console.log('export excel ',res);
@@ -830,7 +757,6 @@
                 } else {
                     this.loading = false;
                     this.loadingProject = false;
-                    this.loadingPassword = false;
                     this.$q.dialog({
                         title: error.response.status + '',
                         message: error.response.data.message
@@ -853,19 +779,6 @@
         width: 76%;
         position: relative;
         margin-top: 300px;
-    }
-    .team-title {
-        position: absolute;
-        top: -88px;
-        font-style: normal;
-        font-size: 20px;
-        font-weight: bold;
-    }
-    .navigator {
-        position: absolute;
-        left:-8px;
-        top: -60px;
-        margin: 0;
     }
     .report-tree-select {
         position: absolute;

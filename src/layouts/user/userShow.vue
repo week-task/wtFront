@@ -1,10 +1,8 @@
 <template>
     <div class="user-show">
-        <em class="team-title">{{user.teamName}} 成员秀</em>
-        <q-breadcrumbs class="bread" separator="●" color="light" active-color="dark">
-            <q-breadcrumbs-el label="HOME" to="/console" />
-            <q-breadcrumbs-el label="USER SHOW" to="/userShow" />
-        </q-breadcrumbs>
+        <slot name="headerTop">
+            <HeaderTop :navList="navList" :funName="funName" :teamName="user.teamName"></HeaderTop>
+        </slot>
         <!-- <q-btn icon="group" label="ALL" @click="checkSelfGroup(false)" class="btn-group" title="所有成员" />
         <q-btn icon="person" label="GROUP" @click="checkSelfGroup(true)" class="btn-group" title="只关注本组成员" /> -->
         
@@ -40,7 +38,7 @@
                 </q-tr>
             </q-table>
         </div>
-        
+
         <q-modal no-esc-dismiss no-backdrop-dismiss v-model="editUserShowModal" @hide="resetForm" :content-css="{padding: '50px', minWidth: '500px'}">
             <div class="q-display-1 q-mb-md">请完善『{{userShowForm.name}}』秀</div>
             <div>
@@ -92,7 +90,28 @@
         <q-modal v-model="maximizedModal" maximized>
             <div style="padding: 12%;">
                 <div class="q-display-1 q-mb-md">
-                    {{userShowDisplay.name}} 
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <!-- <img :src="userShowDisplay.avatar === '' ? 'statics/types/boy-avatar.jpg' : 'http://www.getfile.com' + userShowDisplay.avatar" alt="" @mouseover="popoverAvatar = true" @mouseleave="popoverAvatar = false"> -->
+                            <img :src="userShowDisplay.avatar === '' ? 'statics/types/boy-avatar.jpg' : '//upfiles.heclouds.com' + userShowDisplay.avatar" alt="" @mouseover="popoverAvatar = true" @mouseleave="popoverAvatar = false">
+                            <q-popover v-model="popoverAvatar">
+                                <div style="width:400px; height:400px;">
+                                    <!-- <img
+                                        :src="userShowDisplay.avatar === '' ? 'statics/types/boy-avatar.jpg' : 'http://www.getfile.com' + userShowDisplay.avatar"
+                                        style="width: 400px;"
+                                        @click="notify(), popoverAvatar = false"
+                                    > -->
+                                    <img
+                                        :src="userShowDisplay.avatar === '' ? 'statics/types/boy-avatar.jpg' : '//upfiles.heclouds.com' + userShowDisplay.avatar"
+                                        style="width: 400px;"
+                                        @click="notify(), popoverAvatar = false"
+                                    >
+                                </div>
+                                
+                            </q-popover>
+                        </div>
+                        {{userShowDisplay.name}}  
+                    </div> 
                     <q-btn v-if="userShowDisplay.role != 0" icon="whatshot" flat :color="userShowDisplay.color" disable>
                     {{userShowDisplay.energy}}  {{userShowDisplay.work_status}}
                         <q-tooltip anchor="top left" self="bottom left" :offset="[10, 10]" class="show-energy-desc" style="min-width: 300px;margin-left:20px;">
@@ -125,10 +144,19 @@
     import {required, minLength, maxLength, between} from 'vuelidate/lib/validators';
     import telCheck from '../../plugins/customValidators/telCheck';
     import emailCheck from '../../plugins/customValidators/emailCheck';
+    import HeaderTop from '../common/header';
     export default {
         name: 'User',
         data () {
             return {
+                navList: [{
+                    label: 'HOME', toLink: '/console'
+                },{
+                    label: 'USER SHOW', toLink: '/userShow'
+                }],
+                funName: '成员秀',
+                token: window.localStorage.getItem('token'),
+                popoverAvatar: false,
                 hasFinishedInfo: false,
                 editUserShowModal: false,
                 maximizedModal: false,
@@ -205,6 +233,7 @@
                 intro: {required, maxLength: maxLength(2000)}
             }
         },
+        components: {HeaderTop},
         created () {
             this.init();
         },
@@ -300,11 +329,12 @@
                 _this.userShowDisplay.color = prop.color;
                 _this.userShowDisplay.work_status = prop.status;
                 _this.userShowDisplay.role = prop.role;
+                _this.userShowDisplay.avatar = prop.avatar;
 
                 _this.maximizedModal = true;
             },
             openDialog (prop, isStart) {
-                console.log('prop => ', prop);
+                // console.log('prop => ', prop);
                 this.userShowForm.id = isStart ? prop._id : prop.id;
                 this.userShowForm.name = prop.name;
                 this.userShowForm.motto = prop.motto;
@@ -437,6 +467,22 @@
         // top: 50px;
         // margin: 0 20px;
         // z-index: 100;
+    }
+    .user-info {
+        display: inline-block;
+        font-size: 50px;
+        line-height: 70px;
+        .user-avatar {
+            width: 70px;
+            height: 70px;
+            overflow: hidden;
+            border-radius: 50%;
+            float: left;
+            margin-right: 30px;
+            img {
+                width: 70px;
+            }
+        }
     }
 </style>
 <style lang="less">
