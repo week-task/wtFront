@@ -17,13 +17,15 @@
 
         <q-list separator>
             <q-collapsible v-for="(item, index) in mtaskData" open icon="layers" :label="item.user && item.user.name" :key="index" :header-class="item.period ? '' : 'bg-red text-white'">
+                <q-btn v-if="item.info !== '' && user.role === 0" color="negative" flat label="复制" @click="copyMtask(item)"  />
                 <q-btn v-if="item.info === '' && item.user && item.user.name === user.name && select === currentSelect" color="positive" flat icon="add" label="MTASK" @click="createMtask" class="btn-create" />
                 <q-btn v-if="item.info !== '' && item.user && item.user.name === user.name && select === currentSelect" color="positive" flat icon="mode edit" label="编辑" @click="editMtask(item)"  />
+                
                 <div v-if="item && item.info && item.info !== ''" v-for="(itemP, index) in item.info.split('\n')" v-bind:key="index" class="show-energy-desc-p" style="min-width: 300px;margin-top: 10px;margin-left:20px;">
                     {{itemP}}
                 </div>
 
-                <p v-if="!item.info">暂未填项目经理周报</p>
+                <p v-if="!item.info" class="info-p">暂未填项目经理周报</p>
                 <!-- {{item.info}} -->
             </q-collapsible>
         </q-list>
@@ -150,6 +152,10 @@
                 _this.select = parseInt(_this.weekOfYear);
                 _this.currentSelect === '' ? _this.currentSelect = parseInt(_this.weekOfYear) : '';
             },
+            copyMtask (data) {
+                // console.log('copy data => ', data.info);
+                this.copy(data.info);
+            },
             getMtaskList () {
                 const _this = this;
                 let queryParams = {
@@ -227,6 +233,46 @@
                 }).catch((error)=>{
                     _this.handleError(error);
                 });
+            },
+            copy (data) {
+                let target = null;
+
+                if (data) {
+                    target = document.createElement('div');
+                    target.id = 'tempTarget';
+                    target.style.opacity = '0';
+                    target.innerText = data;
+                    document.body.appendChild(target);
+                } else {
+                    target = document.querySelector('.info-p');
+                }
+
+                try {
+                    let range = document.createRange();
+                    range.selectNode(target);
+                    window.getSelection().removeAllRanges();
+                    window.getSelection().addRange(range);
+                    document.execCommand('copy');
+                    window.getSelection().removeAllRanges();
+                    this.$q.notify({
+                        message: '复制成功',
+                        timeout: 3000,
+                        type: 'positive',
+                        position: 'center'
+                    });
+                } catch (e) {
+                    this.$q.notify({
+                        message: '复制失败',
+                        timeout: 3000,
+                        type: 'negative',
+                        position: 'center'
+                    });
+                }
+
+                if (data) {
+                    // remove temp target
+                    target.parentElement.removeChild(target);
+                }
             },
             resetForm () {
                 const _this = this;
