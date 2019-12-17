@@ -154,7 +154,24 @@
             },
             copyMtask (data) {
                 // console.log('copy data => ', data.info);
-                this.copy(data.info);
+                // this.copy(data.info);
+                // console.log('window', window);
+                // this.copy('合到');
+                this.$copyText(data.info).then((e)=>{
+                    this.$q.notify({
+                        message: '复制成功',
+                        timeout: 3000,
+                        type: 'positive',
+                        position: 'center'
+                    });
+                },(e)=>{
+                    this.$q.notify({
+                        message: '复制失败',
+                        timeout: 3000,
+                        type: 'negative',
+                        position: 'center'
+                    });
+                });
             },
             getMtaskList () {
                 const _this = this;
@@ -236,6 +253,7 @@
             },
             copy (data) {
                 let target = null;
+                console.log('data info =>',data);
 
                 if (data) {
                     target = document.createElement('div');

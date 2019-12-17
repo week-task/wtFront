@@ -5,7 +5,8 @@ module.exports = function (ctx) {
     plugins: [
       'i18n',
       'axios',
-	    'vuelidate'
+      'vuelidate',
+      'vue-clipboard2'
     ],
     css: [
       'app.styl'
