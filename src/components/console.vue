@@ -15,13 +15,10 @@
             ]"
             class="q-mb-sm top-info"
         >
-            更新日志 v1.4.2<br>
+            更新日志 v1.4.3<br>
             <br>
-            ● 新增LOGO<br>
-            ● 新增头像上传<br>
-            ● 优化header显示<br>
-            ● 整合其他功能到header<br>
-            ● 优化成员秀显示
+            ● 迁移至luolinjia.com<br>
+            ● 新增footer备案信息
         </q-alert>
         <a class="good relative-position" v-ripple="true" @click="$router.push('/')">
             <img src="statics/types/week.jpg" alt="">
@@ -39,11 +36,15 @@
             <img src="statics/types/boy-avatar.jpg" alt="">
             <p>成员秀</p>
         </a>
+        <slot name="footerTop">
+            <FooterTop></FooterTop>
+        </slot>
     </div>
 </template>
 
 <script>
-    import HeaderTop from '../layouts/common/header'
+    import HeaderTop from '../layouts/common/header';
+    import FooterTop from '../layouts/common/footer';
     export default {
         name: 'Console',
         data () {
@@ -56,7 +57,7 @@
             }
         },
         validations: {},
-        components: {HeaderTop},
+        components: {HeaderTop, FooterTop},
         created () {
             this.init();
         },
@@ -64,10 +65,10 @@
             init () {
                 const _this = this;
                 _this.user = JSON.parse(localStorage.getItem('user'));
-                _this.visibleTopInfoAlert = localStorage.getItem('notshow_console') === 'v1.4.2' ? false : true;
+                _this.visibleTopInfoAlert = localStorage.getItem('notshow_console') === 'v1.4.3' ? false : true;
             },
             notShow () {
-                window.localStorage.setItem('notshow_console', 'v1.4.2');
+                window.localStorage.setItem('notshow_console', 'v1.4.3');
                 this.visibleTopInfoAlert = false;
             },
         }

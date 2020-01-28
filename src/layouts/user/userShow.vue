@@ -135,7 +135,9 @@
                 <q-icon name="cancel" class="modal-close" @click.native="maximizedModal = false" />
             </div>
         </q-modal>
-
+        <slot name="footerTop">
+            <FooterTop></FooterTop>
+        </slot>
 
     </div>
 </template>
@@ -145,6 +147,7 @@
     import telCheck from '../../plugins/customValidators/telCheck';
     import emailCheck from '../../plugins/customValidators/emailCheck';
     import HeaderTop from '../common/header';
+    import FooterTop from '../common/footer';
     export default {
         name: 'User',
         data () {
@@ -233,7 +236,7 @@
                 intro: {required, maxLength: maxLength(2000)}
             }
         },
-        components: {HeaderTop},
+        components: {HeaderTop, FooterTop},
         created () {
             this.init();
         },

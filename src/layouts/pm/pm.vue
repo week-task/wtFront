@@ -54,7 +54,9 @@
                 <span slot="loading">Loading...</span>
             </q-btn>
         </q-modal>
-
+        <slot name="footerTop">
+            <FooterTop></FooterTop>
+        </slot>
     </div>
 </template>
 
@@ -62,6 +64,7 @@
     import {required, minLength, maxLength} from 'vuelidate/lib/validators';
     import {date} from 'quasar';
     import HeaderTop from '../common/header';
+    import FooterTop from '../common/footer';
     export default {
         name: 'Pm',
         data () {
@@ -79,13 +82,14 @@
                 select: '2019-03-22',
                 currentSelect: '',
                 weekOfYear: '',
-                selectYear: '2019',
+                selectYear: '2020',
                 paginationControl: {rowsPerPage: 0, page: 1},
                 user: {},
                 type: 'all',
                 periodOptions: [],
                 yearPeriodOptions: [
-                    {label: '2019年', value: '2019'}
+                    {label: '2019年', value: '2019'},
+                    {label: '2020年', value: '2020'}
                 ],
                 mtaskForm: {
                     id: '',
@@ -105,7 +109,7 @@
                 info: {required, maxLength: maxLength(512)}
             }
         },
-        components: {HeaderTop},
+        components: {HeaderTop, FooterTop},
         created () {
 ////            this.getInitData();
 //            const _this = this;
@@ -143,7 +147,10 @@
                 
                 // console.log(date.formatDate(new Date(2018, 11, 30), 'w'))
                 // update the time on 2019-01-03
-                for (let i = (_this.selectYear === '2018' ? 52 : parseInt(_this.weekOfYear)); i > (_this.selectYear === '2019' ? 12 : 0); i--) {
+                // update the time on 2020-01-01 本次兼容每年的周报日志期数，因2018年
+                // update the time on 2020-01-01 本次解决未来所有年份周数问题，但2018年特殊，要特殊处理，即2018年只有10-52期
+                // TODO 每年应该都只有52个星期，如果哪一年有53个星期，以下的for循环会出现bug，也就是53期展示不出来的情况
+                for (let i = (_this.selectYear === date.formatDate(Date.now(), 'YYYY') ? parseInt(_this.weekOfYear) : 52); i > (_this.selectYear === '2019' ? 12 : 0); i--) {
                     _this.periodOptions.push({
                         label: (_this.isAdmin ? '' : _this.user.name + ' ') + '第'+ i + '期项目经理周报',
                         value: i

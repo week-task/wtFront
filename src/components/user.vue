@@ -89,13 +89,16 @@
                 <span slot="loading">Loading...</span>
             </q-btn>
         </q-modal>
-
+        <slot name="footerTop">
+            <FooterTop></FooterTop>
+        </slot>
     </div>
 </template>
 
 <script>
     import {required, minLength, maxLength} from 'vuelidate/lib/validators';
-    import HeaderTop from '../layouts/common/header'
+    import HeaderTop from '../layouts/common/header';
+    import FooterTop from '../layouts/common/footer';
     export default {
         name: 'User',
         data () {
@@ -177,7 +180,7 @@
                 pRole: {required}
             }
         },
-        components: {HeaderTop},
+        components: {HeaderTop, FooterTop},
         created () {
 ////            this.getInitData();
 //            const _this = this;

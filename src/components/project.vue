@@ -50,12 +50,16 @@
                 </q-btn>
             </div>
         </q-modal>
+        <slot name="footerTop">
+            <FooterTop></FooterTop>
+        </slot>
     </div>
 </template>
 
 <script>
     import {required, minLength} from 'vuelidate/lib/validators';
-    import HeaderTop from '../layouts/common/header'
+    import HeaderTop from '../layouts/common/header';
+    import FooterTop from '../layouts/common/footer';
     export default {
         name: 'Project',
         data () {
@@ -103,7 +107,7 @@
                 name: {required}
             }
         },
-        components: {HeaderTop},
+        components: {HeaderTop, FooterTop},
         created () {
 ////            this.getInitData();
 //            const _this = this;

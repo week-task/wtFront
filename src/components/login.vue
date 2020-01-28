@@ -54,11 +54,15 @@
             <q-spinner-hourglass slot="loading" size="20px" />
             <span slot="loading">进入中...</span>
         </q-btn>
+        <slot name="footerTop">
+            <FooterTop></FooterTop>
+        </slot>
     </div>
 </template>
 
 <script>
     import {required, minLength} from 'vuelidate/lib/validators';
+    import FooterTop from '../layouts/common/footer';
     export default {
         name: 'Login',
         data () {
@@ -76,6 +80,7 @@
                 password: {required}
             }
         },
+        components: {FooterTop},
         created () {
 //            this.getInitData();
         },
