@@ -27,8 +27,9 @@ Router.beforeEach((to, from, next) => {
   }
   if (to.meta.requireAuth) {
     const token = localStorage.getItem('token');
-    if (token && token !== 'null') {
-      Vue.prototype.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    const user = localStorage.getItem('user');
+    if (token && token !== 'null' && (JSON.parse(user).role+'' === token.split('z|')[1])) {
+      Vue.prototype.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + token.split('z|')[0];
       next();
     } else {
       next('/login');

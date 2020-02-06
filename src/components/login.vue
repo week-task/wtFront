@@ -124,7 +124,7 @@
                             localStorage.setItem('user', JSON.stringify(authInfo.user));
                             localStorage.setItem('token', authInfo.token);
                             // Bearer是JWT的头部认证
-                            _this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + authInfo.token;
+                            _this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + authInfo.token.split('z|')[0];
                             if (authInfo.user.role === -1) {
                                 _this.$router.push('/admin');
                             } else {

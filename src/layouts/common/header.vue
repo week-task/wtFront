@@ -160,6 +160,7 @@
                 _this.user = JSON.parse(localStorage.getItem('user'));
                 // _this.userInfoAvatar = !_this.user.avatar ? 'statics/types/boy-avatar.jpg' : 'http://www.getfile.com' + _this.user.avatar; // 开发环境
                 _this.userInfoAvatar = !_this.user.avatar ? 'statics/types/boy-avatar.jpg' : '//upfiles.heclouds.com' + _this.user.avatar; //线上环境
+//                if (_this.token.split('z|')[1] !== _this.user.role) window.location.href = '';
             },
             bindLogoEvent () {
                 document.getElementById('ttlogo').pauseAnimations();
