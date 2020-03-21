@@ -15,11 +15,18 @@
             ]"
             class="q-mb-sm top-info"
         >
-            更新日志 v1.4.3<br>
+            更新日志 v2.0.1<br>
             <br>
-            ● 迁移至luolinjia.com<br>
-            ● 新增footer备案信息
+            ● 月报OKR优化:<br>
+              <br>
+              ○ 新增『复制』功能,可以从当月的目标复制到绩效<br>
+              ○ 展示板新增以下展示: 自我评分、自我评价、组长评价<br>
+              ○ 新增流程组长评价,小组成员通过或者驳回需要写评价,组长本身的评价由TL填写
         </q-alert>
+        <a class="good relative-position" v-ripple="true" @click="goOkr">
+            <img src="statics/types/okr.jpg" alt="">
+            <p>月报OKR</p>
+        </a>
         <a class="good relative-position" v-ripple="true" @click="$router.push('/')">
             <img src="statics/types/week.jpg" alt="">
             <p>周报</p>
@@ -65,12 +72,15 @@
             init () {
                 const _this = this;
                 _this.user = JSON.parse(localStorage.getItem('user'));
-                _this.visibleTopInfoAlert = localStorage.getItem('notshow_console') === 'v1.4.3' ? false : true;
+                _this.visibleTopInfoAlert = localStorage.getItem('notshow_console') === 'v2.0.1' ? false : true;
             },
             notShow () {
-                window.localStorage.setItem('notshow_console', 'v1.4.3');
+                window.localStorage.setItem('notshow_console', 'v2.0.1');
                 this.visibleTopInfoAlert = false;
             },
+            goOkr () {
+                window.location.href = 'https://luolinjia.com/tt/okr'
+            }
         }
     }
 </script>
@@ -148,7 +158,7 @@
     }
     .top-info {
         margin-bottom: 3rem;
-        width: 70%;
+        width: 80%;
     }
 </style>
 <style lang="less">
