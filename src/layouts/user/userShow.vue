@@ -22,16 +22,22 @@
                 >
                 
                 <q-tr slot="body" slot-scope="props" :props="props">
-                    <q-td key="name" :props="props" width="25%">
+                    <q-td key="name" :props="props" width="10%">
                         {{ props.row.name }}
                     </q-td>
-                    <q-td key="tel" :props="props" width="25%">
+                    <q-td key="workNo" :props="props" width="10%">
+                        {{ props.row.workNo }}
+                    </q-td>
+                    <q-td key="tel" :props="props" width="15%">
                         {{ props.row.tel }}
                     </q-td>
                     <q-td key="email" :props="props" width="25%">
                         {{ props.row.email }}
                     </q-td>
-                    <q-td key="op" :props="props" width="25%">
+                    <q-td key="workContent" :props="props" width="20%">
+                        {{ props.row.workContent }}
+                    </q-td>
+                    <q-td key="op" :props="props" width="20%">
                         <q-btn flat color="primary" icon="visibility" @click="renderDialog(props.row)">VIEW</q-btn>
                         <q-btn v-if="props.row.id === user._id || user.role === 0" flat color="primary" icon="visibility" @click="openDialog(props.row, false)">EDIT</q-btn>
                     </q-td>
@@ -65,6 +71,22 @@
                     <q-input float-label="邮箱"
                              @input="$v.userShowForm.email.$touch"
                              v-model="userShowForm.email" />
+                </q-field>
+                <q-field
+                        class="form-field"
+                        :error="$v.userShowForm.workNo.$error"
+                        :error-label="$v.userShowForm.workNo.maxLength ? errMessage.requireInfo : errMessage.maxInfoWorkNo">
+                    <q-input float-label="工号/合作公司"
+                             @input="$v.userShowForm.workNo.$touch"
+                             v-model="userShowForm.workNo" />
+                </q-field>
+                <q-field
+                        class="form-field"
+                        :error="$v.userShowForm.workContent.$error"
+                        :error-label="$v.userShowForm.workContent.maxLength ? errMessage.requireInfo : errMessage.maxInfoWorkContent">
+                    <q-input float-label="负责什么?"
+                             @input="$v.userShowForm.workContent.$touch"
+                             v-model="userShowForm.workContent" />
                 </q-field>
                 <q-field
                         class="form-field"
@@ -177,6 +199,12 @@
                     sortable: true,
                     field: 'name'
                 },{
+                    name: 'workNo',
+                    label: '工号/合作公司',
+                    align: 'left',
+                    sortable: true,
+                    field: 'workNo'
+                },{
                     name: 'tel',
                     label: '手机',
                     align: 'left',
@@ -188,7 +216,13 @@
                     align: 'left',
                     sortable: true,
                     field: 'email'
-                }, {
+                },{
+                  name: 'workContent',
+                  label: '负责什么?',
+                  align: 'left',
+                  sortable: true,
+                  field: 'workContent'
+                },{
                     name: 'op',
                     label: '操作',
                     align: 'left',
@@ -201,6 +235,8 @@
                     tel: '',
                     email: '',
                     intro: '',
+                    workNo: '',
+                    workContent: '',
                     // avatar: '' // 用户头像下个版本开发
                 },
                 userShowDisplay: {
@@ -209,6 +245,8 @@
                     tel: '',
                     email: '',
                     intro: '',
+                    workNo: '',
+                    workContent: '',
                     energy: 100,
                     energy_desc: '',
                     color: '',
@@ -224,6 +262,8 @@
                     maxInfoIntro: '文本长度 < 2000',
                     telCheck: '你确定是手机号？',
                     emailCheck: '你确定是邮箱？',
+                    maxInfoWorkNo: '文本长度 < 20',
+                    maxInfoWorkContent: '文本长度 < 150',
                 }
             }
         },
@@ -233,7 +273,9 @@
                 motto: { maxLength: maxLength(200)},
                 tel: {required, telCheck},
                 email: {required, emailCheck},
-                intro: {required, maxLength: maxLength(2000)}
+                intro: {required, maxLength: maxLength(2000)},
+                workNo: {required, maxLength: maxLength(20)},
+                workContent: {required, maxLength: maxLength(150)},
             }
         },
         components: {HeaderTop, FooterTop},
@@ -327,6 +369,8 @@
                 _this.userShowDisplay.email = prop.email;
                 _this.userShowDisplay.motto = prop.motto;
                 _this.userShowDisplay.intro = prop.intro;
+                _this.userShowDisplay.workNo = prop.workNo;
+                _this.userShowDisplay.workContent = prop.workContent;
                 _this.userShowDisplay.energy = prop.energy;
                 _this.userShowDisplay.energy_desc = prop.energy_desc;
                 _this.userShowDisplay.color = prop.color;
@@ -344,6 +388,8 @@
                 this.userShowForm.tel = prop.tel;
                 this.userShowForm.email = prop.email;
                 this.userShowForm.intro = prop.intro;
+                this.userShowForm.workNo = prop.workNo;
+                this.userShowForm.workContent = prop.workContent;
                 this.editUserShowModal = true;
             },
             checkSelfGroup (isShowSelfGroup) {

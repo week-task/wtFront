@@ -9,15 +9,15 @@
 
         <ul class="example-energy">
             <li>
-                <q-progress class="" :percentage="100" color="negative" stripe animate height="40px" />
+                <q-progress class="" :percentage="100" color="negative" stripe height="40px" />
                 Busy
             </li>
             <li>
-                <q-progress class="" :percentage="100" color="warning" stripe animate height="40px" />
+                <q-progress class="" :percentage="100" color="warning" stripe height="40px" />
                 Normal
             </li>
             <li>
-                <q-progress class="" :percentage="100" color="positive" stripe animate height="40px" />
+                <q-progress class="" :percentage="100" color="positive" stripe height="40px" />
                 Free
             </li>
             <li class="free-rate">
@@ -35,7 +35,6 @@
                             :percentage="100 - item.energy"
                             :color="item.color"
                             stripe
-                            animate
                             height="40px"
                         />
                         <div class="updated-time">{{item.updated_at}}</div>

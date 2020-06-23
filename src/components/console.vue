@@ -15,13 +15,10 @@
             ]"
             class="q-mb-sm top-info"
         >
-            更新日志 v2.0.1<br>
+            更新日志 v2.0.2<br>
             <br>
-            ● 月报OKR优化:<br>
-              <br>
-              ○ 新增『复制』功能,可以从当月的目标复制到绩效<br>
-              ○ 展示板新增以下展示: 自我评分、自我评价、组长评价<br>
-              ○ 新增流程组长评价,小组成员通过或者驳回需要写评价,组长本身的评价由TL填写
+            ● 能量图优化,不再执行动画<br>
+            ● 成员秀优化,新增工号/合作公司和负责产品线<br>
         </q-alert>
         <a class="good relative-position" v-ripple="true" @click="goOkr">
             <img src="statics/types/okr.jpg" alt="">
@@ -75,7 +72,7 @@
                 _this.visibleTopInfoAlert = localStorage.getItem('notshow_console') === 'v2.0.1' ? false : true;
             },
             notShow () {
-                window.localStorage.setItem('notshow_console', 'v2.0.1');
+                window.localStorage.setItem('notshow_console', 'v2.0.2');
                 this.visibleTopInfoAlert = false;
             },
             goOkr () {
